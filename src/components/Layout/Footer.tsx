@@ -19,7 +19,7 @@ export const Footer: React.FC = () => {
               </div>
               <div className="flex flex-col">
                 <span className="font-extrabold text-lg tracking-tight text-white uppercase font-heading">
-                  SONGÜL MARİN
+                  SONGUR MARİN
                 </span>
                 <span className="text-[9px] text-cyan-400 tracking-widest font-semibold uppercase">
                   Makine & Ekipman San.
@@ -126,7 +126,7 @@ export const Footer: React.FC = () => {
               </li>
               <li className="flex items-center gap-2.5">
                 <Mail className="w-4 h-4 text-cyan-400 shrink-0" />
-                <a href="mailto:info@songulmarin.com" className="hover:text-white transition-colors">{t('email')}</a>
+                <a href="mailto:info@songurmarin.com" className="hover:text-white transition-colors">{t('email')}</a>
               </li>
             </ul>
           </div>
@@ -135,7 +135,7 @@ export const Footer: React.FC = () => {
 
         {/* Bottom Bar */}
         <div className="pt-8 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs text-slate-500">
-          <p>© {new Date().getFullYear()} Songül Marin Makine San. ve Tic. Ltd. Şti. {t('rightsReserved')}</p>
+          <p>© {new Date().getFullYear()} Songur Marin Makine San. ve Tic. Ltd. Şti. {t('rightsReserved')}</p>
           <div className="flex items-center gap-6">
             <Link to="/kvkk" className="hover:text-slate-300 transition-colors">{t('navKvkk')}</Link>
             <span className="text-slate-700">•</span>

@@ -159,7 +159,7 @@ export const mockServices: Service[] = [
     titleEn: 'Sales & Project Engineering',
     summaryTr: 'İhtiyaçlarınıza uygun ekipman seçimi, rıhtım ve çekek alanı yerleşim projelendirmesi.',
     summaryEn: 'Equipment selection tailored to your needs, dock layout engineering, and feasibility study.',
-    contentTr: 'Songül Marin Makine uzman mühendislik kadrosu, marina ve tersanenizin fiziksel koşullarını inceleyerek rıhtım havuzu (quay basin) ölçülerine ve hedef tekne tonajına en uygun ekipman seçeneğini belirler.',
+    contentTr: 'Songur Marin Makine uzman mühendislik kadrosu, marina ve tersanenizin fiziksel koşullarını inceleyerek rıhtım havuzu (quay basin) ölçülerine ve hedef tekne tonajına en uygun ekipman seçeneğini belirler.',
     contentEn: 'Our engineering team analyzes your marina and shipyard dimensions to specify the optimal lifting equipment matching quay basin and target vessel tonnage.',
     iconName: 'Compass',
     imageUrl: 'https://images.unsplash.com/photo-1581092335397-9583fe92d232?w=800&auto=format&fit=crop&q=80',
@@ -367,13 +367,13 @@ export const mockPages: Page[] = [
     slug: 'hakkimizda',
     titleTr: 'Hakkımızda',
     titleEn: 'About Us',
-    summaryTr: 'Songül Marin Makine olarak 25 yılı aşkın tecrübemizle denizcilik ve ağır sanayi sektörüne yön veriyoruz.',
-    summaryEn: 'With over 25 years of experience, Songul Marin Machinery leads the maritime and heavy industry sector.',
+    summaryTr: 'Songur Marin Makine olarak 25 yılı aşkın tecrübemizle denizcilik ve ağır sanayi sektörüne yön veriyoruz.',
+    summaryEn: 'With over 25 years of experience, Songur Marin Machinery leads the maritime and heavy industry sector.',
     contentTr: `<h3>Denizcilik Ekipmanlarında Çeyrek Asırlık Mühendislik ve Güven</h3>
-    <p>Songül Marin Makine, marina, liman ve tersane sektörlerinde kullanılan yüksek kapasiteli mobil kaldırma vinçleri (boat hoist), bot taşıyıcılar ve ağır sanayi transfer sistemleri alanında Türkiye'nin lider tedarikçi ve mühendislik firmalarından biridir.</p>
+    <p>Songur Marin Makine, marina, liman ve tersane sektörlerinde kullanılan yüksek kapasiteli mobil kaldırma vinçleri (boat hoist), bot taşıyıcılar ve ağır sanayi transfer sistemleri alanında Türkiye'nin lider tedarikçi ve mühendislik firmalarından biridir.</p>
     <p>Dünya lideri <strong>Cimolai Technology</strong> başta olmak üzere uluslararası markaların yetkili temsilciliğini yürüten firmamız, satış öncesi projelendirmeden sahada montaja, 7/24 teknik servisten periyodik bakıma kadar uçtan uca hizmet sunmaktadır.</p>`,
     contentEn: `<h3>Quarter Century of Engineering and Trust in Marine Equipment</h3>
-    <p>Songul Marin Machinery is one of Turkey's leading suppliers and engineering partners specializing in high-capacity mobile boat hoists, boat transporters, and heavy industrial transfer systems for marinas, ports, and shipyards.</p>`,
+    <p>Songur Marin Machinery is one of Turkey's leading suppliers and engineering partners specializing in high-capacity mobile boat hoists, boat transporters, and heavy industrial transfer systems for marinas, ports, and shipyards.</p>`,
     imageUrl: 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=1000&auto=format&fit=crop&q=80'
   },
   {

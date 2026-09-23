@@ -15,7 +15,7 @@ export const TopBar: React.FC = () => {
             <Phone className="w-3.5 h-3.5 text-sky-400" />
             <span>{t('phone')}</span>
           </a>
-          <a href="mailto:info@songulmarin.com" className="flex items-center gap-1.5 hover:text-sky-400 transition-colors font-medium">
+          <a href="mailto:info@songurmarin.com" className="flex items-center gap-1.5 hover:text-sky-400 transition-colors font-medium">
             <Mail className="w-3.5 h-3.5 text-sky-400" />
             <span>{t('email')}</span>
           </a>

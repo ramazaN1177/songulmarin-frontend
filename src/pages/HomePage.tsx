@@ -174,7 +174,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenQuoteModal }) => {
               <div className="aspect-[4/3] rounded-2xl overflow-hidden border border-slate-200 shadow-xl relative group">
                 <img
                   src="https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=1000&auto=format&fit=crop&q=80"
-                  alt="Songül Marin Makine"
+                  alt="Songur Marin Makine"
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                 />
               </div>
@@ -193,7 +193,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenQuoteModal }) => {
 
             <div className="space-y-6">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-bold uppercase tracking-wider border border-blue-200">
-                <span>Songül Marin Makine</span>
+                <span>Songur Marin Makine</span>
               </div>
               <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 font-heading leading-tight">
                 Marina & Tersaneler İçin Uçtan Uca Mühendislik Çözümleri

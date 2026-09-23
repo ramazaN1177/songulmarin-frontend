@@ -43,7 +43,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenQuoteModal }) => {
             </div>
             <div className="flex flex-col">
               <span className="font-extrabold text-lg sm:text-xl tracking-tight text-slate-900 group-hover:text-blue-700 transition-colors uppercase font-heading">
-                SONGÜL MARİN
+                SONGUR MARİN
               </span>
               <span className="text-[10px] text-blue-600 tracking-widest font-bold uppercase">
                 Makine & Ekipman San.

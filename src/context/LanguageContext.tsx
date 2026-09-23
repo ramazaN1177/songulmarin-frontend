@@ -11,7 +11,7 @@ interface Translations {
 const translations: Translations = {
   // TopBar & Header
   phone: { tr: '+90 (216) 123 45 67', en: '+90 (216) 123 45 67' },
-  email: { tr: 'info@songulmarin.com', en: 'info@songulmarin.com' },
+  email: { tr: 'info@songurmarin.com', en: 'info@songurmarin.com' },
   addressHeader: { tr: 'Tuzla, İstanbul - Türkiye', en: 'Tuzla, Istanbul - Turkey' },
   workingHours: { tr: 'Pzt - Cmt: 08:30 - 18:00', en: 'Mon - Sat: 08:30 - 18:00' },
   requestQuote: { tr: 'Teklif Alın', en: 'Get a Quote' },
@@ -64,7 +64,7 @@ const translations: Translations = {
   categoryService: { tr: 'Servis & Bakım', en: 'Service & Maintenance' },
   
   // Footer & Contact
-  footerDesc: { tr: 'Songül Marin Makine; marin vinçleri, mobil boat hoist, bot taşıyıcılar ve ağır sanayi kaldırma ekipmanlarında güvenilir çözüm ortağınızdır.', en: 'Songul Marin Machinery is your reliable solution partner in marine hoists, mobile boat hoists, boat transporters, and heavy industrial lifting equipment.' },
+  footerDesc: { tr: 'Songur Marin Makine; marin vinçleri, mobil boat hoist, bot taşıyıcılar ve ağır sanayi kaldırma ekipmanlarında güvenilir çözüm ortağınızdır.', en: 'Songur Marin Machinery is your reliable solution partner in marine hoists, mobile boat hoists, boat transporters, and heavy industrial lifting equipment.' },
   quickLinks: { tr: 'Hızlı Bağlantılar', en: 'Quick Links' },
   contactUs: { tr: 'İletişim Bilgileri', en: 'Contact Information' },
   rightsReserved: { tr: 'Tüm Hakları Saklıdır.', en: 'All Rights Reserved.' },

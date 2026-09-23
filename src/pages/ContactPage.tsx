@@ -54,7 +54,7 @@ export const ContactPage: React.FC = () => {
             
             <div className="bg-white border border-slate-200 rounded-2xl p-8 space-y-6 shadow-sm">
               <h3 className="text-xl font-bold text-slate-900 font-heading border-b border-slate-100 pb-4">
-                Songül Marin Makine San. ve Tic. Ltd. Şti.
+                Songur Marin Makine San. ve Tic. Ltd. Şti.
               </h3>
 
               <div className="space-y-4 text-sm text-slate-700">
@@ -78,7 +78,7 @@ export const ContactPage: React.FC = () => {
                   <Mail className="w-5 h-5 text-blue-600 shrink-0" />
                   <div>
                     <strong className="block text-slate-900">E-posta:</strong>
-                    <a href="mailto:info@songulmarin.com" className="hover:text-blue-700 transition-colors">{t('email')}</a>
+                    <a href="mailto:info@songurmarin.com" className="hover:text-blue-700 transition-colors">{t('email')}</a>
                   </div>
                 </div>
 
@@ -95,7 +95,7 @@ export const ContactPage: React.FC = () => {
             {/* Google Map Embed Container */}
             <div className="aspect-[16/10] bg-white rounded-2xl overflow-hidden border border-slate-200 shadow-md">
               <iframe
-                title="Songul Marin Map"
+                title="Songur Marin Map"
                 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d12062.88514571994!2d29.288220000000002!3d40.82424!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x14cadc1e626e2e21%3A0x6b87be9823901b0!2sTuzla%2C%20%C4%B0stanbul!5e0!3m2!1str!2str!4v1700000000000!5m2!1str!2str"
                 className="w-full h-full border-0"
                 loading="lazy"
