@@ -125,3 +125,22 @@ export interface QuoteFormData {
   message: string;
   productOrService?: string;
 }
+
+export interface FormSubmission extends QuoteFormData {
+  id: number;
+  isRead?: boolean;
+  createdAt: string;
+}
+
+export interface User {
+  id: number;
+  email: string;
+  name: string;
+  role: 'SUPERADMIN' | 'ADMIN';
+}
+
+export interface AuthResponse {
+  token: string;
+  user: User;
+}
+
