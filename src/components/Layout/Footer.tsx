@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Anchor, Phone, Mail, MapPin, ChevronRight, ShieldCheck } from 'lucide-react';
+import { Phone, Mail, MapPin, ChevronRight, ShieldCheck } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
 
 export const Footer: React.FC = () => {
@@ -13,25 +13,27 @@ export const Footer: React.FC = () => {
           
           {/* Col 1: Brand Info */}
           <div className="space-y-4">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center text-slate-950 font-bold">
-                <Anchor className="w-5 h-5 text-slate-950" />
-              </div>
-              <div className="flex flex-col">
-                <span className="font-extrabold text-lg tracking-tight text-white uppercase font-heading">
+            <Link to="/" className="flex items-center gap-3">
+              <img 
+                src="/songurmarinlogo.png" 
+                alt="Songur Marin Logo" 
+                className="h-10 sm:h-12 w-auto object-contain self-center" 
+              />
+              <div className="flex flex-col justify-center self-center">
+                <span className="font-extrabold text-base sm:text-lg tracking-tight text-white uppercase font-heading leading-none">
                   SONGUR MARİN
                 </span>
-                <span className="text-[9px] text-cyan-400 tracking-widest font-semibold uppercase">
+                <span className="text-[9px] text-cyan-400 tracking-widest font-semibold uppercase mt-0.5">
                   Makine & Ekipman San.
                 </span>
               </div>
-            </div>
+            </Link>
             <p className="text-xs leading-relaxed text-slate-400">
               {t('footerDesc')}
             </p>
             <div className="pt-2 flex items-center gap-2 text-xs text-cyan-400 font-medium">
               <ShieldCheck className="w-4 h-4 text-cyan-400" />
-              <span>Cimolai Technology Authorized Rep.</span>
+              <span>Authorized Sales & Technical Service Rep.</span>
             </div>
           </div>
 

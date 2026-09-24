@@ -1,10 +1,11 @@
-import { useState } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { LanguageProvider } from './context/LanguageContext';
 import { TopBar } from './components/Layout/TopBar';
 import { Navbar } from './components/Layout/Navbar';
 import { Footer } from './components/Layout/Footer';
 import { QuoteModal } from './components/QuoteModal';
+import { ScrollToTopButton } from './components/ScrollToTopButton';
 
 import { HomePage } from './pages/HomePage';
 import { CorporatePage } from './pages/CorporatePage';
@@ -18,6 +19,17 @@ import { ServiceDetailPage } from './pages/ServiceDetailPage';
 import { GalleryPage } from './pages/GalleryPage';
 import { ContactPage } from './pages/ContactPage';
 
+// Auto scroll to top on route navigation
+function ScrollToTopOnRouteChange() {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+
+  return null;
+}
+
 export function App() {
   const [isQuoteModalOpen, setIsQuoteModalOpen] = useState(false);
   const [selectedProductOrService, setSelectedProductOrService] = useState<string | undefined>();
@@ -30,7 +42,8 @@ export function App() {
   return (
     <LanguageProvider>
       <Router>
-        <div className="min-h-screen bg-slate-50 text-slate-800 flex flex-col font-sans selection:bg-blue-600 selection:text-white">
+        <ScrollToTopOnRouteChange />
+        <div className="min-h-screen bg-slate-50 text-slate-800 flex flex-col font-sans selection:bg-blue-600 selection:text-white relative">
           <TopBar />
           <Navbar onOpenQuoteModal={() => handleOpenQuoteModal()} />
 
@@ -52,6 +65,9 @@ export function App() {
           </main>
 
           <Footer />
+
+          {/* Floating Back to Top Button */}
+          <ScrollToTopButton />
 
           <QuoteModal
             isOpen={isQuoteModalOpen}

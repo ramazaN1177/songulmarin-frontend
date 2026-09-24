@@ -326,7 +326,7 @@ export const mockHeroSlides: HeroSlide[] = [
     titleEn: 'Your Reliable Solution Partner in the Maritime Industry',
     subtitleTr: 'Marina, liman ve tersane projeleriniz için dünya standartlarında mobil vinç ve bot taşıyıcı sistemleri.',
     subtitleEn: 'World-class mobile boat hoists and boat transport systems for your marina, port and shipyard projects.',
-    imageUrl: 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=1600&auto=format&fit=crop&q=80',
+    imageUrl: '/src/assets/hero/hero-slide-1.jpg',
     buttonTextTr: 'Ürünlerimizi Keşfedin',
     buttonTextEn: 'Discover Our Products',
     buttonUrl: '/urunler',
@@ -339,7 +339,7 @@ export const mockHeroSlides: HeroSlide[] = [
     titleEn: 'Cimolai Technology Authorized Turkey Representative',
     subtitleTr: '1000 tona kadar kaldırma kapasiteli İtalyan mühendisliği harikası mobil vinçler ile gücünüze güç katın.',
     subtitleEn: 'Empower your shipyard with Italian engineering excellence hoists up to 1000 tons capacity.',
-    imageUrl: 'https://images.unsplash.com/photo-1508873696983-2df515122519?w=1600&auto=format&fit=crop&q=80',
+    imageUrl: '/src/assets/hero/hero-slide-2.jpg',
     buttonTextTr: 'Markalarımız',
     buttonTextEn: 'Our Brands',
     buttonUrl: '/markalar',
@@ -352,7 +352,7 @@ export const mockHeroSlides: HeroSlide[] = [
     titleEn: '24/7 Expert Technical Service & Genuine Spares',
     subtitleTr: 'Tüm vinç ve kaldırma sistemleriniz için profesyonel periyodik bakım, revizyon ve belgelendirme.',
     subtitleEn: 'Professional periodic maintenance, overhaul, and load certification for all lifting systems.',
-    imageUrl: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=1600&auto=format&fit=crop&q=80',
+    imageUrl: '/src/assets/hero/hero-slide-3.jpg',
     buttonTextTr: 'Hizmetlerimiz',
     buttonTextEn: 'Our Services',
     buttonUrl: '/hizmetler',
@@ -374,7 +374,7 @@ export const mockPages: Page[] = [
     <p>Dünya lideri <strong>Cimolai Technology</strong> başta olmak üzere uluslararası markaların yetkili temsilciliğini yürüten firmamız, satış öncesi projelendirmeden sahada montaja, 7/24 teknik servisten periyodik bakıma kadar uçtan uca hizmet sunmaktadır.</p>`,
     contentEn: `<h3>Quarter Century of Engineering and Trust in Marine Equipment</h3>
     <p>Songur Marin Machinery is one of Turkey's leading suppliers and engineering partners specializing in high-capacity mobile boat hoists, boat transporters, and heavy industrial transfer systems for marinas, ports, and shipyards.</p>`,
-    imageUrl: 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=1000&auto=format&fit=crop&q=80'
+    imageUrl: '/src/assets/sections/about.jpg'
   },
   {
     id: 2,

@@ -1,13 +1,22 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   ChevronRight, ChevronLeft, ShieldCheck, Award, Wrench, 
-  ArrowRight, Play, Eye, CheckCircle2, PhoneCall 
+  ArrowRight, Play, Eye, CheckCircle2, PhoneCall, Anchor, Settings, Globe 
 } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { apiService } from '../api/client';
 import type { HeroSlide, Brand, Product, Service, GalleryItem } from '../types';
 import { LightboxModal } from '../components/LightboxModal';
+
+// Import local images
+import heroSlide1 from '../assets/hero/hero-slide-1.jpg';
+import heroSlide2 from '../assets/hero/hero-slide-2.jpg';
+import heroSlide3 from '../assets/hero/hero-slide-3.jpg';
+import aboutSectionImg from '../assets/sections/about.jpg';
+import ctaBannerImg from '../assets/sections/cta-banner.jpg';
+
+const localHeroImages = [heroSlide1, heroSlide2, heroSlide3];
 
 interface HomePageProps {
   onOpenQuoteModal: (productTitle?: string) => void;
@@ -18,6 +27,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenQuoteModal }) => {
 
   const [slides, setSlides] = useState<HeroSlide[]>([]);
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
+  const [isTransitioning, setIsTransitioning] = useState(false);
   const [brands, setBrands] = useState<Brand[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [services, setServices] = useState<Service[]>([]);
@@ -42,94 +52,219 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenQuoteModal }) => {
     fetchData();
   }, []);
 
+  const goToSlide = useCallback((index: number) => {
+    if (isTransitioning) return;
+    setIsTransitioning(true);
+    setCurrentSlideIndex(index);
+    setTimeout(() => setIsTransitioning(false), 800);
+  }, [isTransitioning]);
+
   // Hero slider auto-advance
   useEffect(() => {
     if (slides.length === 0) return;
     const interval = setInterval(() => {
-      setCurrentSlideIndex((prev) => (prev + 1) % slides.length);
-    }, 6000);
+      goToSlide((currentSlideIndex + 1) % slides.length);
+    }, 7000);
     return () => clearInterval(interval);
-  }, [slides]);
+  }, [slides, currentSlideIndex, goToSlide]);
 
   const currentSlide = slides[currentSlideIndex];
 
   return (
     <div className="space-y-0 bg-slate-50">
       
-      {/* HERO SLIDER (Executive Marine Dark Blue for visual impact) */}
-      <section className="relative min-h-[560px] lg:min-h-[640px] bg-gradient-to-r from-blue-950 via-blue-900 to-slate-900 flex items-center justify-center overflow-hidden">
-        {slides.length > 0 && currentSlide && (
-          <div className="absolute inset-0 z-0">
+      {/* HERO SECTION — High Contrast Ultra-Readable Cinematic Hero */}
+      <section className="relative h-[72vh] min-h-[500px] max-h-[700px] overflow-hidden bg-slate-950">
+        
+        {/* Background Images with Ken Burns zoom effect */}
+        {slides.map((slide, index) => (
+          <div
+            key={slide.id}
+            className="absolute inset-0 transition-opacity duration-1000 ease-in-out"
+            style={{ 
+              opacity: index === currentSlideIndex ? 1 : 0,
+              zIndex: index === currentSlideIndex ? 1 : 0
+            }}
+          >
             <img
-              src={currentSlide.imageUrl}
-              alt={getField(currentSlide, 'title') || 'Hero Image'}
-              className="w-full h-full object-cover opacity-30 scale-105 transition-transform duration-1000"
+              src={localHeroImages[index] || localHeroImages[0]}
+              alt={getField(slide, 'title') || ''}
+              className="w-full h-full object-cover"
+              style={{
+                animation: index === currentSlideIndex ? 'kenBurns 12s ease-in-out forwards' : 'none',
+              }}
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-blue-950 via-blue-950/60 to-transparent"></div>
-            <div className="absolute inset-0 bg-gradient-to-r from-blue-950 via-transparent to-blue-950/80"></div>
           </div>
-        )}
+        ))}
+        
+        {/* Left Dark Gradient Overlay for Maximum Text Contrast without darkening the full image */}
+        <div 
+          className="absolute inset-0 z-[2]" 
+          style={{
+            background: 'linear-gradient(to right, rgba(15,23,42,0.88) 0%, rgba(15,23,42,0.75) 45%, rgba(15,23,42,0.3) 75%, rgba(15,23,42,0.1) 100%)'
+          }} 
+        />
+        {/* Top protection gradient */}
+        <div 
+          className="absolute inset-x-0 top-0 h-24 z-[2]" 
+          style={{
+            background: 'linear-gradient(to bottom, rgba(15,23,42,0.6), transparent)'
+          }} 
+        />
+        {/* Bottom protection gradient */}
+        <div 
+          className="absolute inset-x-0 bottom-0 h-36 z-[2]" 
+          style={{
+            background: 'linear-gradient(to top, rgba(15,23,42,0.85), transparent)'
+          }} 
+        />
 
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 w-full">
-          <div className="max-w-3xl space-y-6">
-            
-            {/* Badge */}
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-sky-400/10 border border-sky-400/30 text-sky-300 text-xs font-semibold uppercase tracking-wider backdrop-blur-md">
-              <ShieldCheck className="w-4 h-4 text-sky-400" />
-              <span>Marine & Heavy Crane Solutions</span>
-            </div>
-
-            {/* Slide Title */}
-            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-white leading-tight font-heading drop-shadow-md">
-              {currentSlide ? getField(currentSlide, 'title') : 'Denizcilik Sektöründe Güvenilir Çözüm Ortağınız'}
-            </h1>
-
-            {/* Slide Subtitle */}
-            <p className="text-base sm:text-xl text-slate-200 font-light leading-relaxed max-w-2xl">
-              {currentSlide ? getField(currentSlide, 'subtitle') : 'Marina, liman ve tersane projeleriniz için dünya standartlarında mobil vinç ve bot taşıyıcı sistemleri.'}
-            </p>
-
-            {/* Buttons */}
-            <div className="pt-4 flex flex-wrap gap-4 items-center">
-              <button
-                onClick={() => onOpenQuoteModal()}
-                className="bg-gradient-to-r from-sky-400 to-blue-600 hover:from-sky-300 hover:to-blue-500 text-blue-950 font-bold px-7 py-3.5 rounded-xl shadow-xl shadow-sky-500/25 transition-all text-base flex items-center gap-2 hover:scale-[1.02]"
+        {/* Main Hero Content */}
+        <div className="relative z-10 h-full flex items-center">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+            <div className="max-w-3xl space-y-6">
+              
+              {/* Animated Badge */}
+              <div 
+                className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full border text-xs font-bold uppercase tracking-widest shadow-lg"
+                style={{
+                  background: 'rgba(15, 23, 42, 0.75)',
+                  borderColor: 'rgba(56, 189, 248, 0.5)',
+                  color: '#38bdf8',
+                  backdropFilter: 'blur(16px)',
+                  animation: 'fadeInDown 0.8s ease-out',
+                }}
               >
-                <span>{t('requestQuote')}</span>
-                <ArrowRight className="w-5 h-5" />
-              </button>
+                <ShieldCheck className="w-4 h-4 text-sky-400" />
+                <span>SONGUR MARİN MAKİNE • Mobil Vinç & Ekipman Çözümleri</span>
+              </div>
 
-              <Link
-                to="/urunler"
-                className="px-6 py-3.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-semibold border border-white/20 text-base backdrop-blur-md transition-all flex items-center gap-2"
+              {/* Main Title — Pure White, Sharp, High Contrast */}
+              <h1 
+                key={`title-${currentSlideIndex}`}
+                className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-black text-white leading-[1.12] font-heading drop-shadow-[0_4px_16px_rgba(0,0,0,0.9)]"
+                style={{
+                  animation: 'fadeInUp 0.7s ease-out',
+                }}
               >
-                <span>{t('viewAllProducts')}</span>
-              </Link>
-            </div>
+                {currentSlide ? getField(currentSlide, 'title') : 'Denizcilik Sektöründe Güvenilir Çözüm Ortağınız'}
+              </h1>
 
+              {/* Subtitle — Crisp Bright Text */}
+              <p 
+                key={`sub-${currentSlideIndex}`}
+                className="text-base sm:text-lg lg:text-xl text-slate-100 font-normal leading-relaxed max-w-2xl drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]"
+                style={{ animation: 'fadeInUp 0.7s ease-out 0.15s both' }}
+              >
+                {currentSlide ? getField(currentSlide, 'subtitle') : 'Marina, liman ve tersane projeleriniz için dünya standartlarında mobil vinç ve bot taşıyıcı sistemleri.'}
+              </p>
+
+              {/* CTA Buttons */}
+              <div 
+                className="pt-3 flex flex-wrap gap-4 items-center"
+                style={{ animation: 'fadeInUp 0.7s ease-out 0.3s both' }}
+              >
+                <button
+                  onClick={() => onOpenQuoteModal()}
+                  className="group relative overflow-hidden bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold px-8 py-4 rounded-xl shadow-2xl shadow-sky-500/40 transition-all text-base flex items-center gap-2.5 hover:scale-[1.03] active:scale-[0.98]"
+                >
+                  <span className="relative z-10">{t('requestQuote')}</span>
+                  <ArrowRight className="w-5 h-5 relative z-10 group-hover:translate-x-0.5 transition-transform" />
+                </button>
+
+                <Link
+                  to="/urunler"
+                  className="group px-7 py-4 rounded-xl text-white font-semibold text-base transition-all flex items-center gap-2.5 border border-white/30 bg-slate-900/60 hover:bg-slate-900/90 backdrop-blur-md shadow-lg"
+                >
+                  <span>{t('viewAllProducts')}</span>
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform text-sky-400" />
+                </Link>
+              </div>
+
+            </div>
           </div>
         </div>
 
-        {/* Slide Controls */}
-        {slides.length > 1 && (
-          <div className="absolute bottom-6 right-6 z-20 flex items-center gap-3">
-            <button
-              onClick={() => setCurrentSlideIndex((prev) => (prev - 1 + slides.length) % slides.length)}
-              className="p-2.5 rounded-full bg-blue-950/80 border border-blue-800 text-slate-300 hover:text-white transition-colors backdrop-blur-md"
+        {/* Floating Stats Badges (Desktop Right) */}
+        <div className="hidden lg:flex absolute bottom-28 right-8 z-10 flex-col gap-3" style={{ animation: 'fadeInRight 1s ease-out 0.5s both' }}>
+          {[
+            { icon: <Anchor className="w-5 h-5" />, value: '25+', label: 'Yıl Tecrübe' },
+            { icon: <Globe className="w-5 h-5" />, value: '500+', label: 'Tamamlanan Proje' },
+            { icon: <Settings className="w-5 h-5" />, value: '1000T', label: 'Maks. Kapasite' },
+          ].map((stat, i) => (
+            <div
+              key={i}
+              className="flex items-center gap-3 px-5 py-3 rounded-xl border border-white/20 bg-slate-900/75 backdrop-blur-xl shadow-xl"
+              style={{
+                animation: `fadeInRight 0.6s ease-out ${0.6 + i * 0.15}s both`,
+              }}
             >
-              <ChevronLeft className="w-5 h-5" />
-            </button>
-            <span className="text-xs font-bold text-slate-300 tracking-widest font-mono">
-              0{currentSlideIndex + 1} / 0{slides.length}
-            </span>
-            <button
-              onClick={() => setCurrentSlideIndex((prev) => (prev + 1) % slides.length)}
-              className="p-2.5 rounded-full bg-blue-950/80 border border-blue-800 text-slate-300 hover:text-white transition-colors backdrop-blur-md"
-            >
-              <ChevronRight className="w-5 h-5" />
-            </button>
+              <div className="text-sky-400">{stat.icon}</div>
+              <div>
+                <span className="text-lg font-extrabold text-white font-heading">{stat.value}</span>
+                <span className="text-[11px] text-slate-200 ml-1.5 font-medium">{stat.label}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Bottom Controls Bar */}
+        <div className="absolute bottom-0 left-0 right-0 z-10">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
+            <div className="flex items-center justify-between">
+              
+              {/* Slide Indicator Dots */}
+              <div className="flex items-center gap-3">
+                {slides.map((_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => goToSlide(index)}
+                    className="relative group py-2"
+                    aria-label={`Slide ${index + 1}`}
+                  >
+                    <div
+                      className="h-1.5 rounded-full transition-all duration-500"
+                      style={{
+                        width: index === currentSlideIndex ? '48px' : '18px',
+                        background: index === currentSlideIndex
+                          ? '#38bdf8'
+                          : 'rgba(255,255,255,0.4)',
+                      }}
+                    />
+                  </button>
+                ))}
+                <span className="text-xs font-bold text-slate-300 ml-3 font-mono tracking-widest">
+                  {String(currentSlideIndex + 1).padStart(2, '0')} / {String(slides.length).padStart(2, '0')}
+                </span>
+              </div>
+
+              {/* Navigation Arrows */}
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => goToSlide((currentSlideIndex - 1 + slides.length) % slides.length)}
+                  className="p-3 rounded-xl border border-white/20 bg-slate-900/60 hover:bg-slate-900/90 text-white transition-all backdrop-blur-md"
+                  aria-label="Previous slide"
+                >
+                  <ChevronLeft className="w-5 h-5 text-white" />
+                </button>
+                <button
+                  onClick={() => goToSlide((currentSlideIndex + 1) % slides.length)}
+                  className="p-3 rounded-xl border border-white/20 bg-slate-900/60 hover:bg-slate-900/90 text-white transition-all backdrop-blur-md"
+                  aria-label="Next slide"
+                >
+                  <ChevronRight className="w-5 h-5 text-white" />
+                </button>
+              </div>
+            </div>
           </div>
-        )}
+        </div>
+
+        {/* Scroll Down Indicator */}
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 hidden md:block" style={{ animation: 'bounce 2s infinite' }}>
+          <div className="w-6 h-10 rounded-full border-2 border-white/40 flex justify-center pt-2 bg-slate-900/40 backdrop-blur-sm">
+            <div className="w-1 h-2.5 rounded-full bg-sky-400" style={{ animation: 'scrollDot 2s infinite' }} />
+          </div>
+        </div>
       </section>
 
       {/* STATS BAR (Light Ice Blue) */}
@@ -138,7 +273,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenQuoteModal }) => {
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 text-center divide-y lg:divide-y-0 lg:divide-x divide-blue-200/80">
             
             <div className="pt-4 lg:pt-0 lg:px-4 space-y-1">
-              <span className="text-3xl sm:text-4xl font-extrabold text-blue-700 font-heading">25+ Yıl</span>
+              <span className="text-3xl sm:text-4xl font-extrabold text-blue-700 font-heading">25+</span>
               <p className="text-sm font-bold text-slate-900">{t('expYears')}</p>
               <p className="text-xs text-slate-600">{t('expYearsSub')}</p>
             </div>
@@ -152,7 +287,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenQuoteModal }) => {
             <div className="pt-4 lg:pt-0 lg:px-4 space-y-1">
               <span className="text-3xl sm:text-4xl font-extrabold text-blue-700 font-heading">1000 Ton</span>
               <p className="text-sm font-bold text-slate-900">Maks. Kaldırma Kapasitesi</p>
-              <p className="text-xs text-slate-600">Cimolai Technology Hoist</p>
+              <p className="text-xs text-slate-600">Mobil Boat Hoist & Vinç</p>
             </div>
 
             <div className="pt-4 lg:pt-0 lg:px-4 space-y-1">
@@ -173,7 +308,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenQuoteModal }) => {
             <div className="relative">
               <div className="aspect-[4/3] rounded-2xl overflow-hidden border border-slate-200 shadow-xl relative group">
                 <img
-                  src="https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=1000&auto=format&fit=crop&q=80"
+                  src={aboutSectionImg}
                   alt="Songur Marin Makine"
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                 />
@@ -185,7 +320,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenQuoteModal }) => {
                   </div>
                   <div>
                     <h4 className="text-slate-900 font-bold text-sm">Temsilcilik & Distribütörlük</h4>
-                    <p className="text-xs text-slate-500">Cimolai Technology S.p.A.</p>
+                    <p className="text-xs text-slate-500">Uluslararası Yetkili Temsilcilik</p>
                   </div>
                 </div>
               </div>
@@ -303,12 +438,12 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenQuoteModal }) => {
                 <div>
                   <div className="aspect-[4/3] bg-slate-100 relative overflow-hidden">
                     <img
-                      src={prod.primaryImage || 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=600&auto=format&fit=crop&q=80'}
+                      src={prod.primaryImage || heroSlide1}
                       alt={getField(prod, 'title')}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
                     <div className="absolute top-3 right-3 bg-blue-700 text-white font-bold text-[10px] px-2.5 py-1 rounded-full uppercase tracking-wider shadow-md">
-                      Cimolai
+                      {prod.brand?.name || 'Yetkili Satış'}
                     </div>
                   </div>
 
@@ -438,8 +573,13 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenQuoteModal }) => {
         </div>
       </section>
 
-      {/* CALL TO ACTION BANNER (Rich Executive Marine Blue) */}
-      <section className="py-20 bg-gradient-to-r from-blue-950 via-blue-900 to-indigo-950 text-white relative overflow-hidden">
+      {/* CALL TO ACTION BANNER (Cinematic with CTA image) */}
+      <section className="py-20 text-white relative overflow-hidden">
+        {/* Background image */}
+        <div className="absolute inset-0">
+          <img src={ctaBannerImg} alt="" className="w-full h-full object-cover" />
+          <div className="absolute inset-0 bg-gradient-to-r from-blue-950/90 via-blue-900/80 to-indigo-950/85" />
+        </div>
         <div className="absolute -right-20 -bottom-20 w-96 h-96 bg-sky-500/10 rounded-full blur-3xl"></div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center space-y-6">
           <h2 className="text-3xl sm:text-5xl font-extrabold font-heading">{t('sectionCtaTitle')}</h2>

@@ -102,7 +102,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ onOpenQuot
           <div className="lg:col-span-5 space-y-6">
             <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-blue-50 border border-blue-200 text-blue-700 text-xs font-bold uppercase tracking-wider">
               <ShieldCheck className="w-4 h-4" />
-              <span>{product.brand?.name || 'Cimolai Technology'}</span>
+              <span>{product.brand?.name || 'Yetkili Temsilcilik'}</span>
             </div>
 
             <h1 className="text-2xl sm:text-4xl font-extrabold text-slate-900 font-heading leading-tight">{title}</h1>

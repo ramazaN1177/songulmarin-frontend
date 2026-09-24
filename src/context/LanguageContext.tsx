@@ -35,7 +35,7 @@ const translations: Translations = {
   projectsCount: { tr: '500+ Tamamlanan Proje', en: '500+ Completed Projects' },
   projectsCountSub: { tr: 'Marina ve Tersane Kurulumları', en: 'Marina & Shipyard Installations' },
   brandsCount: { tr: 'Dünya Markaları', en: 'Global Brands' },
-  brandsCountSub: { tr: 'Cimolai vb. Yetkili Temsilcilik', en: 'Cimolai & Authorized Representation' },
+  brandsCountSub: { tr: 'Dünya Lideri Temsilcilikler', en: 'Global Brands & Representation' },
   support247: { tr: '7/24 Teknik Servis', en: '24/7 Technical Service' },
   support247Sub: { tr: 'Uzman Mühendislik Kadrosu', en: 'Expert Engineering Team' },
 
