@@ -38,7 +38,7 @@ export const AdminLogin: React.FC = () => {
         
         {/* Header Logo */}
         <div className="text-center space-y-3">
-          <div className="inline-flex p-3 rounded-2xl bg-white/10 border border-white/10 shadow-inner">
+          <div className="inline-flex p-3.5 rounded-2xl bg-white shadow-lg border border-slate-100">
             <img src="/songurmarinlogo.png" alt="Songur Marin Logo" className="h-12 w-auto object-contain" />
           </div>
           <div>
