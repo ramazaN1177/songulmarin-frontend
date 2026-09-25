@@ -33,6 +33,26 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenQuoteModal }) => {
   const [services, setServices] = useState<Service[]>([]);
   const [galleryItems, setGalleryItems] = useState<GalleryItem[]>([]);
   const [selectedMedia, setSelectedMedia] = useState<GalleryItem | null>(null);
+  const [brandSlideIndex, setBrandSlideIndex] = useState(0);
+
+  const nextBrandSlide = () => {
+    if (brands.length <= 3) return;
+    setBrandSlideIndex((prev) => (prev + 1 >= brands.length ? 0 : prev + 1));
+  };
+
+  const prevBrandSlide = () => {
+    if (brands.length <= 3) return;
+    setBrandSlideIndex((prev) => (prev === 0 ? brands.length - 1 : prev - 1));
+  };
+
+  const getVisibleBrands = () => {
+    if (brands.length <= 3) return brands;
+    const result = [];
+    for (let i = 0; i < 3; i++) {
+      result.push(brands[(brandSlideIndex + i) % brands.length]);
+    }
+    return result;
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -377,24 +397,55 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenQuoteModal }) => {
       {/* BRANDS SHOWCASE (Light Gray background) */}
       <section className="py-20 bg-slate-100/70 border-y border-slate-200/80">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-3xl mx-auto space-y-3 mb-14">
-            <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 font-heading">{t('sectionBrandsTitle')}</h2>
-            <p className="text-sm sm:text-base text-slate-600">{t('sectionBrandsSub')}</p>
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-12">
+            <div>
+              <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 font-heading">{t('sectionBrandsTitle')}</h2>
+              <p className="text-sm sm:text-base text-slate-600 mt-2">{t('sectionBrandsSub')}</p>
+            </div>
+
+            {/* Slider Controls (Appears if brands > 3) */}
+            {brands.length > 3 && (
+              <div className="flex items-center gap-3 shrink-0">
+                <button
+                  type="button"
+                  onClick={prevBrandSlide}
+                  className="p-3 rounded-xl bg-white border border-slate-200 text-slate-700 hover:text-blue-700 hover:border-blue-300 transition-all shadow-xs"
+                  aria-label="Önceki Markalar"
+                >
+                  <ChevronLeft className="w-5 h-5" />
+                </button>
+                <span className="text-xs font-bold text-slate-500 font-mono px-1">
+                  {brandSlideIndex + 1} / {brands.length}
+                </span>
+                <button
+                  type="button"
+                  onClick={nextBrandSlide}
+                  className="p-3 rounded-xl bg-white border border-slate-200 text-slate-700 hover:text-blue-700 hover:border-blue-300 transition-all shadow-xs"
+                  aria-label="Sonraki Markalar"
+                >
+                  <ChevronRight className="w-5 h-5" />
+                </button>
+              </div>
+            )}
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {brands.map((brand) => (
+            {getVisibleBrands().map((brand) => (
               <div
                 key={brand.id}
                 className="bg-white border border-slate-200/90 rounded-2xl p-8 hover:border-blue-500 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 space-y-6 flex flex-col justify-between"
               >
                 <div className="space-y-4">
-                  <div className="h-16 flex items-center">
-                    <span className="text-2xl font-black text-blue-900 font-heading tracking-wider border-b-2 border-blue-600 pb-1">
-                      {brand.name}
-                    </span>
+                  <div className="h-16 flex items-center gap-3">
+                    {brand.logoUrl ? (
+                      <img src={brand.logoUrl} alt={brand.name} className="h-12 w-auto max-w-[160px] object-contain" />
+                    ) : (
+                      <span className="text-2xl font-black text-blue-900 font-heading tracking-wider border-b-2 border-blue-600 pb-1">
+                        {brand.name}
+                      </span>
+                    )}
                   </div>
-                  <p className="text-xs text-slate-600 leading-relaxed">
+                  <p className="text-xs text-slate-600 leading-relaxed line-clamp-3">
                     {getField(brand, 'description')}
                   </p>
                 </div>
@@ -409,6 +460,22 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenQuoteModal }) => {
               </div>
             ))}
           </div>
+
+          {/* Bottom Dots Indicator */}
+          {brands.length > 3 && (
+            <div className="flex items-center justify-center gap-2 pt-8">
+              {brands.map((_, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => setBrandSlideIndex(idx)}
+                  className={`h-2 rounded-full transition-all duration-300 ${
+                    idx === brandSlideIndex ? 'w-8 bg-blue-600' : 'w-2 bg-slate-300 hover:bg-slate-400'
+                  }`}
+                  aria-label={`Marka ${idx + 1}`}
+                />
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
