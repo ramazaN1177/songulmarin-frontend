@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Award, Plus, Trash2, Save } from 'lucide-react';
+import { Award, Plus, Edit3, Trash2, Save } from 'lucide-react';
 import { apiService } from '../../api/client';
 import { ImageUploader } from '../../components/admin/ImageUploader';
 import { Modal } from '../../components/common/Modal';
@@ -11,6 +11,8 @@ export const AdminReferences: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingRef, setEditingRef] = useState<Partial<Reference> | null>(null);
   const [saving, setSaving] = useState(false);
+
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   useEffect(() => {
     loadReferences();
@@ -33,6 +35,13 @@ export const AdminReferences: React.FC = () => {
       orderIndex: references.length + 1,
       isActive: true
     });
+    setSelectedFile(null);
+    setIsModalOpen(true);
+  };
+
+  const handleOpenEditModal = (ref: Reference) => {
+    setEditingRef({ ...ref });
+    setSelectedFile(null);
     setIsModalOpen(true);
   };
 
@@ -52,11 +61,24 @@ export const AdminReferences: React.FC = () => {
 
     setSaving(true);
     try {
+      let finalLogoUrl = editingRef.logoUrl || null;
+
+      // If user selected a new file, upload to SeaweedFS now on save
+      if (selectedFile) {
+        const uploadRes = await apiService.uploadFile(selectedFile);
+        finalLogoUrl = uploadRes.url;
+      }
+
+      const payload = {
+        ...editingRef,
+        logoUrl: finalLogoUrl
+      };
+
       if (editingRef.id) {
-        const updated = await apiService.updateReference(editingRef.id, editingRef);
+        const updated = await apiService.updateReference(editingRef.id, payload);
         setReferences(references.map(r => r.id === updated.id ? updated : r));
       } else {
-        const created = await apiService.createReference(editingRef);
+        const created = await apiService.createReference(payload);
         setReferences([...references, created]);
       }
       setIsModalOpen(false);
@@ -129,8 +151,16 @@ export const AdminReferences: React.FC = () => {
 
               <div className="pt-3 border-t border-slate-100 flex items-center justify-end gap-2">
                 <button
+                  onClick={() => handleOpenEditModal(ref)}
+                  className="p-1.5 rounded-lg bg-slate-100 hover:bg-blue-50 text-slate-600 hover:text-blue-700 transition-colors"
+                  title="Düzenle"
+                >
+                  <Edit3 className="w-4 h-4" />
+                </button>
+                <button
                   onClick={() => handleDelete(ref.id)}
                   className="p-1.5 rounded-lg bg-slate-100 hover:bg-rose-50 text-slate-600 hover:text-rose-600 transition-colors"
+                  title="Sil"
                 >
                   <Trash2 className="w-4 h-4" />
                 </button>
@@ -152,23 +182,23 @@ export const AdminReferences: React.FC = () => {
         >
           <form onSubmit={handleSave} className="space-y-4 text-xs">
             <div className="space-y-1">
-              <label className="font-bold text-slate-700 dark:text-slate-300 block">Müşteri / Kurum Adı*</label>
+              <label className="font-bold text-slate-700 block">Müşteri / Kurum Adı*</label>
               <input
                 type="text"
                 value={editingRef.clientName || ''}
                 onChange={(e) => setEditingRef({ ...editingRef, clientName: e.target.value })}
                 required
-                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:border-blue-600 dark:text-white"
+                className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-200 focus:outline-none focus:border-blue-600 text-slate-900"
               />
             </div>
 
             <div className="space-y-1">
-              <label className="font-bold text-slate-700 dark:text-slate-300 block">Proje / Teslimat Başlığı (TR)</label>
+              <label className="font-bold text-slate-700 block">Proje / Teslimat Başlığı (TR)</label>
               <input
                 type="text"
                 value={editingRef.titleTr || ''}
                 onChange={(e) => setEditingRef({ ...editingRef, titleTr: e.target.value })}
-                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:border-blue-600 dark:text-white"
+                className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-200 focus:outline-none focus:border-blue-600 text-slate-900"
               />
             </div>
 
@@ -176,26 +206,27 @@ export const AdminReferences: React.FC = () => {
               <ImageUploader
                 label="Referans / Müşteri Logosu"
                 value={editingRef.logoUrl || ''}
+                onFileSelect={(file) => setSelectedFile(file)}
                 onChange={(url) => setEditingRef({ ...editingRef, logoUrl: url })}
                 helperText="Referans firma logosunu bilgisayarınızdan yükleyin"
               />
             </div>
 
             <div className="space-y-1">
-              <label className="font-bold text-slate-700 dark:text-slate-300 block">Proje Yılı</label>
+              <label className="font-bold text-slate-700 block">Proje Yılı</label>
               <input
                 type="number"
                 value={editingRef.projectYear || 2024}
                 onChange={(e) => setEditingRef({ ...editingRef, projectYear: Number(e.target.value) })}
-                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:border-blue-600 dark:text-white"
+                className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-200 focus:outline-none focus:border-blue-600 text-slate-900"
               />
             </div>
 
-            <div className="pt-4 flex items-center justify-end gap-3 border-t border-slate-100 dark:border-slate-800">
+            <div className="pt-4 flex items-center justify-end gap-3 border-t border-slate-100">
               <button
                 type="button"
                 onClick={() => setIsModalOpen(false)}
-                className="px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-700 dark:text-slate-300 font-bold transition-colors"
+                className="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold transition-colors"
               >
                 Vazgeç
               </button>

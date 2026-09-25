@@ -5,6 +5,7 @@ import { apiService } from '../../api/client';
 interface ImageUploaderProps {
   value: string;
   onChange: (url: string) => void;
+  onFileSelect?: (file: File | null) => void;
   label?: string;
   helperText?: string;
   className?: string;
@@ -13,6 +14,7 @@ interface ImageUploaderProps {
 export const ImageUploader: React.FC<ImageUploaderProps> = ({
   value,
   onChange,
+  onFileSelect,
   label = 'Görsel Seç / Yükle',
   helperText = 'PNG, JPG, WEBP, SVG veya GIF (Max 10MB)',
   className = '',
@@ -32,8 +34,17 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
     }
 
     setErrorMessage(null);
-    setIsUploading(true);
 
+    // If onFileSelect is provided, generate local preview URL and defer uploading until form submission
+    if (onFileSelect) {
+      const previewUrl = URL.createObjectURL(file);
+      onFileSelect(file);
+      onChange(previewUrl);
+      return;
+    }
+
+    // Immediate upload fallback if onFileSelect is not passed
+    setIsUploading(true);
     try {
       const res = await apiService.uploadFile(file);
       onChange(res.url);
@@ -43,6 +54,13 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
     } finally {
       setIsUploading(false);
     }
+  };
+
+  const handleRemove = () => {
+    if (onFileSelect) {
+      onFileSelect(null);
+    }
+    onChange('');
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -149,7 +167,7 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
                   </button>
                   <button
                     type="button"
-                    onClick={() => onChange('')}
+                    onClick={handleRemove}
                     className="px-3 py-1.5 text-xs font-semibold text-rose-600 bg-rose-50 border border-rose-200 rounded-lg hover:bg-rose-100 transition-colors flex items-center gap-1.5"
                   >
                     <X className="w-3.5 h-3.5" />

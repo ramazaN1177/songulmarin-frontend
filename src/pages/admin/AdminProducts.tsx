@@ -82,6 +82,8 @@ export const AdminProducts: React.FC = () => {
     setLoading(false);
   };
 
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+
   const handleOpenAddModal = () => {
     setEditingProduct({
       titleTr: '',
@@ -92,16 +94,18 @@ export const AdminProducts: React.FC = () => {
       contentEn: '',
       brandId: brands[0]?.id || 1,
       slug: '',
-      primaryImage: '/src/assets/hero/hero-slide-1.jpg',
+      primaryImage: '',
       featured: true,
       isActive: true,
       orderIndex: products.length + 1
     });
+    setSelectedFile(null);
     setIsModalOpen(true);
   };
 
   const handleOpenEditModal = (prod: Product) => {
     setEditingProduct({ ...prod });
+    setSelectedFile(null);
     setIsModalOpen(true);
   };
 
@@ -121,11 +125,23 @@ export const AdminProducts: React.FC = () => {
 
     setSaving(true);
     try {
+      let finalPrimaryImage = editingProduct.primaryImage || null;
+
+      if (selectedFile) {
+        const uploadRes = await apiService.uploadFile(selectedFile);
+        finalPrimaryImage = uploadRes.url;
+      }
+
+      const payload = {
+        ...editingProduct,
+        primaryImage: finalPrimaryImage
+      };
+
       if (editingProduct.id) {
-        const updated = await apiService.updateProduct(editingProduct.id, editingProduct);
+        const updated = await apiService.updateProduct(editingProduct.id, payload);
         setProducts(products.map(p => p.id === updated.id ? updated : p));
       } else {
-        const created = await apiService.createProduct(editingProduct);
+        const created = await apiService.createProduct(payload);
         setProducts([created, ...products]);
       }
       setIsModalOpen(false);
@@ -150,7 +166,7 @@ export const AdminProducts: React.FC = () => {
           featured: Boolean(editingProduct.featured),
           orderIndex: editingProduct.orderIndex || 1,
           isActive: Boolean(editingProduct.isActive),
-          primaryImage: editingProduct.primaryImage
+          primaryImage: editingProduct.primaryImage || null
         };
         setProducts([dummy, ...products]);
       }
@@ -452,6 +468,7 @@ export const AdminProducts: React.FC = () => {
               <ImageUploader
                 label="Ürün Ana Görseli"
                 value={editingProduct.primaryImage || ''}
+                onFileSelect={(file) => setSelectedFile(file)}
                 onChange={(url) => setEditingProduct({ ...editingProduct, primaryImage: url })}
                 helperText="Ürün için bilgisayarınızdan görsel yükleyin (PNG, JPG, WEBP)"
               />

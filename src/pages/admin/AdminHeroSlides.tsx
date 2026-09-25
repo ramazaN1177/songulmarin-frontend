@@ -12,6 +12,8 @@ export const AdminHeroSlides: React.FC = () => {
   const [editingSlide, setEditingSlide] = useState<Partial<HeroSlide> | null>(null);
   const [saving, setSaving] = useState(false);
 
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+
   useEffect(() => {
     loadSlides();
   }, []);
@@ -29,17 +31,19 @@ export const AdminHeroSlides: React.FC = () => {
       titleEn: '',
       subtitleTr: '',
       subtitleEn: '',
-      imageUrl: '/src/assets/hero/hero-slide-1.jpg',
+      imageUrl: '',
       buttonTextTr: 'Ürünlerimizi Keşfedin',
       buttonUrl: '/urunler',
       orderIndex: slides.length + 1,
       isActive: true
     });
+    setSelectedFile(null);
     setIsModalOpen(true);
   };
 
   const handleOpenEditModal = (slide: HeroSlide) => {
     setEditingSlide({ ...slide });
+    setSelectedFile(null);
     setIsModalOpen(true);
   };
 
@@ -59,11 +63,23 @@ export const AdminHeroSlides: React.FC = () => {
 
     setSaving(true);
     try {
+      let finalImageUrl = editingSlide.imageUrl || null;
+
+      if (selectedFile) {
+        const uploadRes = await apiService.uploadFile(selectedFile);
+        finalImageUrl = uploadRes.url;
+      }
+
+      const payload = {
+        ...editingSlide,
+        imageUrl: finalImageUrl || ''
+      };
+
       if (editingSlide.id) {
-        const updated = await apiService.updateHeroSlide(editingSlide.id, editingSlide);
+        const updated = await apiService.updateHeroSlide(editingSlide.id, payload);
         setSlides(slides.map(s => s.id === updated.id ? updated : s));
       } else {
-        const created = await apiService.createHeroSlide(editingSlide);
+        const created = await apiService.createHeroSlide(payload);
         setSlides([...slides, created]);
       }
       setIsModalOpen(false);
@@ -77,7 +93,7 @@ export const AdminHeroSlides: React.FC = () => {
           titleEn: editingSlide.titleEn || null,
           subtitleTr: editingSlide.subtitleTr || null,
           subtitleEn: editingSlide.subtitleEn || null,
-          imageUrl: editingSlide.imageUrl || '/src/assets/hero/hero-slide-1.jpg',
+          imageUrl: editingSlide.imageUrl || '',
           buttonTextTr: editingSlide.buttonTextTr || null,
           buttonTextEn: editingSlide.buttonTextEn || null,
           buttonUrl: editingSlide.buttonUrl || null,
@@ -194,6 +210,7 @@ export const AdminHeroSlides: React.FC = () => {
               <ImageUploader
                 label="Slayt Görseli"
                 value={editingSlide.imageUrl || ''}
+                onFileSelect={(file) => setSelectedFile(file)}
                 onChange={(url) => setEditingSlide({ ...editingSlide, imageUrl: url })}
                 helperText="Ana sayfa manşeti için yüksek çözünürlüklü yatay görsel yükleyin"
               />

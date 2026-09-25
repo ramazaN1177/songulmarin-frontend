@@ -52,7 +52,7 @@ export interface Product {
   orderIndex: number;
   isActive: boolean;
   images?: ProductImage[];
-  primaryImage?: string;
+  primaryImage?: string | null;
 }
 
 export interface Service {

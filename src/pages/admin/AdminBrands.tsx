@@ -12,6 +12,8 @@ export const AdminBrands: React.FC = () => {
   const [editingBrand, setEditingBrand] = useState<Partial<Brand> | null>(null);
   const [saving, setSaving] = useState(false);
 
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+
   useEffect(() => {
     loadBrands();
   }, []);
@@ -33,11 +35,13 @@ export const AdminBrands: React.FC = () => {
       orderIndex: brands.length + 1,
       isActive: true
     });
+    setSelectedFile(null);
     setIsModalOpen(true);
   };
 
   const handleOpenEditModal = (brand: Brand) => {
     setEditingBrand({ ...brand });
+    setSelectedFile(null);
     setIsModalOpen(true);
   };
 
@@ -57,11 +61,23 @@ export const AdminBrands: React.FC = () => {
 
     setSaving(true);
     try {
+      let finalLogoUrl = editingBrand.logoUrl || null;
+
+      if (selectedFile) {
+        const uploadRes = await apiService.uploadFile(selectedFile);
+        finalLogoUrl = uploadRes.url;
+      }
+
+      const payload = {
+        ...editingBrand,
+        logoUrl: finalLogoUrl
+      };
+
       if (editingBrand.id) {
-        const updated = await apiService.updateBrand(editingBrand.id, editingBrand);
+        const updated = await apiService.updateBrand(editingBrand.id, payload);
         setBrands(brands.map(b => b.id === updated.id ? updated : b));
       } else {
-        const created = await apiService.createBrand(editingBrand);
+        const created = await apiService.createBrand(payload);
         setBrands([...brands, created]);
       }
       setIsModalOpen(false);
@@ -184,6 +200,7 @@ export const AdminBrands: React.FC = () => {
               <ImageUploader
                 label="Marka Logosu"
                 value={editingBrand.logoUrl || ''}
+                onFileSelect={(file) => setSelectedFile(file)}
                 onChange={(url) => setEditingBrand({ ...editingBrand, logoUrl: url })}
                 helperText="Marka logosunu bilgisayarınızdan seçip yükleyin (PNG, SVG, JPG)"
               />

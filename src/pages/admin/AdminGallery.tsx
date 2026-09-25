@@ -12,6 +12,8 @@ export const AdminGallery: React.FC = () => {
   const [editingItem, setEditingItem] = useState<Partial<GalleryItem> | null>(null);
   const [saving, setSaving] = useState(false);
 
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+
   useEffect(() => {
     loadGallery();
   }, []);
@@ -29,11 +31,12 @@ export const AdminGallery: React.FC = () => {
       titleEn: '',
       type: 'IMAGE',
       category: 'Marina & Liman',
-      mediaUrl: 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=1000&auto=format&fit=crop&q=80',
+      mediaUrl: '',
       thumbnailUrl: null,
       orderIndex: items.length + 1,
       isActive: true
     });
+    setSelectedFile(null);
     setIsModalOpen(true);
   };
 
@@ -49,15 +52,34 @@ export const AdminGallery: React.FC = () => {
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!editingItem || !editingItem.mediaUrl) return;
+    if (!editingItem) return;
 
     setSaving(true);
+
     try {
+      let finalMediaUrl = editingItem.mediaUrl || '';
+
+      if (selectedFile) {
+        const uploadRes = await apiService.uploadFile(selectedFile);
+        finalMediaUrl = uploadRes.url;
+      }
+
+      if (!finalMediaUrl) {
+        alert('Lütfen bir görsel seçin.');
+        setSaving(false);
+        return;
+      }
+
+      const payload = {
+        ...editingItem,
+        mediaUrl: finalMediaUrl
+      };
+
       if (editingItem.id) {
-        const updated = await apiService.updateGalleryItem(editingItem.id, editingItem);
+        const updated = await apiService.updateGalleryItem(editingItem.id, payload);
         setItems(items.map(i => i.id === updated.id ? updated : i));
       } else {
-        const created = await apiService.createGalleryItem(editingItem);
+        const created = await apiService.createGalleryItem(payload);
         setItems([...items, created]);
       }
       setIsModalOpen(false);
@@ -70,7 +92,7 @@ export const AdminGallery: React.FC = () => {
           type: editingItem.type || 'IMAGE',
           titleTr: editingItem.titleTr || 'Galeri İtemi',
           titleEn: editingItem.titleEn || null,
-          mediaUrl: editingItem.mediaUrl,
+          mediaUrl: editingItem.mediaUrl || '',
           thumbnailUrl: editingItem.thumbnailUrl || null,
           category: editingItem.category || 'Marina & Liman',
           orderIndex: editingItem.orderIndex || 1,
@@ -198,6 +220,7 @@ export const AdminGallery: React.FC = () => {
               <ImageUploader
                 label="Galeri Medyası / Görseli"
                 value={editingItem.mediaUrl || ''}
+                onFileSelect={(file) => setSelectedFile(file)}
                 onChange={(url) => setEditingItem({ ...editingItem, mediaUrl: url })}
                 helperText="Galeri için bilgisayarınızdan görsel seçin veya yükleyin"
               />

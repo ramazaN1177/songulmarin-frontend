@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Wrench, Plus, Edit3, Trash2, Save } from 'lucide-react';
 import { apiService } from '../../api/client';
-import { ImageUploader } from '../../components/admin/ImageUploader';
 import { RichContentEditor } from '../../components/admin/RichContentEditor';
 import { Modal } from '../../components/common/Modal';
 import type { Service } from '../../types';
@@ -170,32 +169,23 @@ export const AdminServices: React.FC = () => {
         >
           <form onSubmit={handleSave} className="space-y-4 text-xs">
             <div className="space-y-1">
-              <label className="font-bold text-slate-700 dark:text-slate-300 block">Hizmet Adı (TR)*</label>
+              <label className="font-bold text-slate-800 block">Hizmet Adı (TR)*</label>
               <input
                 type="text"
                 value={editingService.titleTr || ''}
                 onChange={(e) => setEditingService({ ...editingService, titleTr: e.target.value })}
                 required
-                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:border-blue-600 dark:text-white"
-              />
-            </div>
-
-            <div>
-              <ImageUploader
-                label="Hizmet Kapak Görseli"
-                value={editingService.imageUrl || ''}
-                onChange={(url) => setEditingService({ ...editingService, imageUrl: url })}
-                helperText="Hizmet kapak görselini bilgisayarınızdan seçin veya yükleyin"
+                className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-200 focus:outline-none focus:border-blue-600 text-slate-900"
               />
             </div>
 
             <div className="space-y-1">
-              <label className="font-bold text-slate-700 dark:text-slate-300 block">Özet Açıklama (TR)</label>
+              <label className="font-bold text-slate-700 block">Özet Açıklama (TR)</label>
               <textarea
                 rows={2}
                 value={editingService.summaryTr || ''}
                 onChange={(e) => setEditingService({ ...editingService, summaryTr: e.target.value })}
-                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:border-blue-600 dark:text-white"
+                className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-200 focus:outline-none focus:border-blue-600 text-slate-900"
               />
             </div>
 
@@ -208,11 +198,11 @@ export const AdminServices: React.FC = () => {
               />
             </div>
 
-            <div className="pt-4 flex items-center justify-end gap-3 border-t border-slate-100 dark:border-slate-800">
+            <div className="pt-4 flex items-center justify-end gap-3 border-t border-slate-100">
               <button
                 type="button"
                 onClick={() => setIsModalOpen(false)}
-                className="px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-700 dark:text-slate-300 font-bold transition-colors"
+                className="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold transition-colors"
               >
                 Vazgeç
               </button>
