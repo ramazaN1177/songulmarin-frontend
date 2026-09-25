@@ -9,5 +9,5 @@ services:
         VITE_API_URL: ${VITE_API_URL:-http://localhost:3001/api}
     container_name: songur_frontend
     restart: always
-    ports:
-      - "80:80"
+    expose:
+      - "80"
