@@ -7,11 +7,11 @@ import {
   mockBrands, mockProducts, mockServices, mockReferences, mockGallery, mockHeroSlides, mockPages 
 } from './mockData';
 
-const API_BASE_URL = 'http://localhost:3001/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 4000,
+  timeout: 8000,
 });
 
 // Interceptor to attach JWT token
@@ -271,9 +271,8 @@ export const apiService = {
     return res.data;
   },
 
-  // Upload File (Supports Node API, IHS PHP hosting, and FileReader fallback)
+  // Upload File (Node.js API with FileReader fallback)
   uploadFile: async (file: File): Promise<{ url: string; filename: string }> => {
-    // 1. Try Node.js API
     try {
       const formData = new FormData();
       formData.append('file', file);
@@ -282,28 +281,9 @@ export const apiService = {
       });
       if (res.data && res.data.url) return res.data;
     } catch {
-      // Fall through to PHP / FileReader
+      // Fall through to Base64 FileReader fallback for offline dev mode
     }
 
-    // 2. Try PHP upload endpoint on hosting (/upload.php)
-    try {
-      const formData = new FormData();
-      formData.append('file', file);
-      const phpRes = await fetch('/upload.php', {
-        method: 'POST',
-        body: formData,
-      });
-      if (phpRes.ok) {
-        const data = await phpRes.json();
-        if (data && data.url) {
-          return { url: data.url, filename: data.filename || file.name };
-        }
-      }
-    } catch {
-      // Fall through to FileReader
-    }
-
-    // 3. Fallback to Base64 FileReader for local preview / offline mode
     return new Promise((resolve) => {
       const reader = new FileReader();
       reader.onloadend = () => {
