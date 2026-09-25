@@ -271,25 +271,45 @@ export const apiService = {
     return res.data;
   },
 
-  // Upload File
+  // Upload File (Supports Node API, IHS PHP hosting, and FileReader fallback)
   uploadFile: async (file: File): Promise<{ url: string; filename: string }> => {
+    // 1. Try Node.js API
     try {
       const formData = new FormData();
       formData.append('file', file);
       const res = await api.post('/admin/upload', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
+        headers: { 'Content-Type': 'multipart/form-data' },
       });
-      return res.data;
+      if (res.data && res.data.url) return res.data;
     } catch {
-      return new Promise((resolve) => {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          resolve({ url: reader.result as string, filename: file.name });
-        };
-        reader.readAsDataURL(file);
-      });
+      // Fall through to PHP / FileReader
     }
+
+    // 2. Try PHP upload endpoint on hosting (/upload.php)
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      const phpRes = await fetch('/upload.php', {
+        method: 'POST',
+        body: formData,
+      });
+      if (phpRes.ok) {
+        const data = await phpRes.json();
+        if (data && data.url) {
+          return { url: data.url, filename: data.filename || file.name };
+        }
+      }
+    } catch {
+      // Fall through to FileReader
+    }
+
+    // 3. Fallback to Base64 FileReader for local preview / offline mode
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        resolve({ url: reader.result as string, filename: file.name });
+      };
+      reader.readAsDataURL(file);
+    });
   }
 };
