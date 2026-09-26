@@ -47,6 +47,10 @@ export const AdminReferences: React.FC = () => {
 
   const handleDelete = async (id: number) => {
     if (!window.confirm('Bu referansı silmek istediğinize emin misiniz?')) return;
+    const target = references.find(r => r.id === id);
+    if (target?.logoUrl) {
+      await apiService.deleteFile(target.logoUrl);
+    }
     try {
       await apiService.deleteReference(id);
       setReferences(references.filter(r => r.id !== id));
@@ -62,11 +66,17 @@ export const AdminReferences: React.FC = () => {
     setSaving(true);
     try {
       let finalLogoUrl = editingRef.logoUrl || null;
+      const originalRef = references.find(r => r.id === editingRef.id);
 
       // If user selected a new file, upload to SeaweedFS now on save
       if (selectedFile) {
         const uploadRes = await apiService.uploadFile(selectedFile);
         finalLogoUrl = uploadRes.url;
+        if (originalRef?.logoUrl && originalRef.logoUrl !== finalLogoUrl) {
+          await apiService.deleteFile(originalRef.logoUrl);
+        }
+      } else if (editingRef.id && !editingRef.logoUrl && originalRef?.logoUrl) {
+        await apiService.deleteFile(originalRef.logoUrl);
       }
 
       const payload = {

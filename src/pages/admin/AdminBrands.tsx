@@ -47,6 +47,10 @@ export const AdminBrands: React.FC = () => {
 
   const handleDelete = async (id: number) => {
     if (!window.confirm('Bu markayı silmek istediğinize emin misiniz?')) return;
+    const target = brands.find(b => b.id === id);
+    if (target?.logoUrl) {
+      await apiService.deleteFile(target.logoUrl);
+    }
     try {
       await apiService.deleteBrand(id);
       setBrands(brands.filter(b => b.id !== id));
@@ -62,10 +66,16 @@ export const AdminBrands: React.FC = () => {
     setSaving(true);
     try {
       let finalLogoUrl = editingBrand.logoUrl || null;
+      const originalBrand = brands.find(b => b.id === editingBrand.id);
 
       if (selectedFile) {
         const uploadRes = await apiService.uploadFile(selectedFile);
         finalLogoUrl = uploadRes.url;
+        if (originalBrand?.logoUrl && originalBrand.logoUrl !== finalLogoUrl) {
+          await apiService.deleteFile(originalBrand.logoUrl);
+        }
+      } else if (editingBrand.id && !editingBrand.logoUrl && originalBrand?.logoUrl) {
+        await apiService.deleteFile(originalBrand.logoUrl);
       }
 
       const payload = {

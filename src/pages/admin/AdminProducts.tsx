@@ -111,6 +111,10 @@ export const AdminProducts: React.FC = () => {
 
   const handleDelete = async (id: number) => {
     if (!window.confirm('Bu ürünü silmek istediğinize emin misiniz?')) return;
+    const target = products.find(p => p.id === id);
+    if (target?.primaryImage) {
+      await apiService.deleteFile(target.primaryImage);
+    }
     try {
       await apiService.deleteProduct(id);
       setProducts(products.filter(p => p.id !== id));
@@ -126,10 +130,16 @@ export const AdminProducts: React.FC = () => {
     setSaving(true);
     try {
       let finalPrimaryImage = editingProduct.primaryImage || null;
+      const originalProd = products.find(p => p.id === editingProduct.id);
 
       if (selectedFile) {
         const uploadRes = await apiService.uploadFile(selectedFile);
         finalPrimaryImage = uploadRes.url;
+        if (originalProd?.primaryImage && originalProd.primaryImage !== finalPrimaryImage) {
+          await apiService.deleteFile(originalProd.primaryImage);
+        }
+      } else if (editingProduct.id && !editingProduct.primaryImage && originalProd?.primaryImage) {
+        await apiService.deleteFile(originalProd.primaryImage);
       }
 
       const payload = {

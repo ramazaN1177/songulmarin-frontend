@@ -48,6 +48,10 @@ export const AdminGallery: React.FC = () => {
 
   const handleDelete = async (id: number) => {
     if (!window.confirm('Bu galeri görselini silmek istediğinize emin misiniz?')) return;
+    const target = items.find(i => i.id === id);
+    if (target?.mediaUrl) {
+      await apiService.deleteFile(target.mediaUrl);
+    }
     try {
       await apiService.deleteGalleryItem(id);
       setItems(items.filter(i => i.id !== id));
@@ -64,10 +68,16 @@ export const AdminGallery: React.FC = () => {
 
     try {
       let finalMediaUrl = editingItem.mediaUrl || '';
+      const originalItem = items.find(i => i.id === editingItem.id);
 
       if (selectedFile) {
         const uploadRes = await apiService.uploadFile(selectedFile);
         finalMediaUrl = uploadRes.url;
+        if (originalItem?.mediaUrl && originalItem.mediaUrl !== finalMediaUrl) {
+          await apiService.deleteFile(originalItem.mediaUrl);
+        }
+      } else if (editingItem.id && !editingItem.mediaUrl && originalItem?.mediaUrl) {
+        await apiService.deleteFile(originalItem.mediaUrl);
       }
 
       if (!finalMediaUrl) {

@@ -292,5 +292,16 @@ export const apiService = {
       };
       reader.readAsDataURL(file);
     });
+  },
+
+  // Delete file from SeaweedFS / storage
+  deleteFile: async (url?: string | null): Promise<void> => {
+    if (!url || typeof url !== 'string') return;
+    if (url.startsWith('blob:') || url.startsWith('data:')) return;
+    try {
+      await api.delete('/admin/upload', { data: { url } });
+    } catch {
+      // Ignore background delete errors
+    }
   }
 };

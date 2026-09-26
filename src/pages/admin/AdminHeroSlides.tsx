@@ -49,6 +49,10 @@ export const AdminHeroSlides: React.FC = () => {
 
   const handleDelete = async (id: number) => {
     if (!window.confirm('Bu manşet slaytını silmek istediğinize emin misiniz?')) return;
+    const target = slides.find(s => s.id === id);
+    if (target?.imageUrl) {
+      await apiService.deleteFile(target.imageUrl);
+    }
     try {
       await apiService.deleteHeroSlide(id);
       setSlides(slides.filter(s => s.id !== id));
@@ -64,10 +68,16 @@ export const AdminHeroSlides: React.FC = () => {
     setSaving(true);
     try {
       let finalImageUrl = editingSlide.imageUrl || null;
+      const originalSlide = slides.find(s => s.id === editingSlide.id);
 
       if (selectedFile) {
         const uploadRes = await apiService.uploadFile(selectedFile);
         finalImageUrl = uploadRes.url;
+        if (originalSlide?.imageUrl && originalSlide.imageUrl !== finalImageUrl) {
+          await apiService.deleteFile(originalSlide.imageUrl);
+        }
+      } else if (editingSlide.id && !editingSlide.imageUrl && originalSlide?.imageUrl) {
+        await apiService.deleteFile(originalSlide.imageUrl);
       }
 
       const payload = {
