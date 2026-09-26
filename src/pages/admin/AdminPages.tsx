@@ -14,6 +14,7 @@ export const AdminPages: React.FC = () => {
   const [editingSummaryTr, setEditingSummaryTr] = useState('');
   const [editingSummaryEn, setEditingSummaryEn] = useState('');
   const [editingImage, setEditingImage] = useState('');
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [saving, setSaving] = useState(false);
   const [savedMessage, setSavedMessage] = useState(false);
 
@@ -43,6 +44,7 @@ export const AdminPages: React.FC = () => {
     setEditingSummaryTr(page.summaryTr || '');
     setEditingSummaryEn(page.summaryEn || '');
     setEditingImage(page.imageUrl || '');
+    setSelectedFile(null);
     setSavedMessage(false);
   };
 
@@ -54,16 +56,29 @@ export const AdminPages: React.FC = () => {
     setSavedMessage(false);
 
     try {
+      let finalImageUrl = editingImage || null;
+
+      if (selectedFile) {
+        const uploadRes = await apiService.uploadFile(selectedFile);
+        finalImageUrl = uploadRes.url;
+        if (selectedPage.imageUrl && selectedPage.imageUrl !== finalImageUrl) {
+          await apiService.deleteFile(selectedPage.imageUrl);
+        }
+      } else if (!editingImage && selectedPage.imageUrl) {
+        await apiService.deleteFile(selectedPage.imageUrl);
+      }
+
       const updated = await apiService.updatePage(selectedPage.id, {
         ...selectedPage,
         contentTr: editingContentTr,
         contentEn: editingContentEn,
         summaryTr: editingSummaryTr,
         summaryEn: editingSummaryEn,
-        imageUrl: editingImage
+        imageUrl: finalImageUrl || undefined
       });
       setPages(pages.map(p => p.id === updated.id ? updated : p));
       setSelectedPage(updated);
+      setSelectedFile(null);
       setSavedMessage(true);
     } catch {
       const updated: Page = {
@@ -72,10 +87,11 @@ export const AdminPages: React.FC = () => {
         contentEn: editingContentEn,
         summaryTr: editingSummaryTr,
         summaryEn: editingSummaryEn,
-        imageUrl: editingImage
+        imageUrl: editingImage || undefined
       };
       setPages(pages.map(p => p.id === selectedPage.id ? updated : p));
       setSelectedPage(updated);
+      setSelectedFile(null);
       setSavedMessage(true);
     } finally {
       setSaving(false);
@@ -204,6 +220,7 @@ export const AdminPages: React.FC = () => {
                   <ImageUploader
                     label="Sayfa Kapak Görseli (Opsiyonel)"
                     value={editingImage}
+                    onFileSelect={(file) => setSelectedFile(file)}
                     onChange={(url) => setEditingImage(url)}
                     helperText="Sayfanın üst alanında gösterilecek geniş manzara kapak görseli yükleyin"
                   />
