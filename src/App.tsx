@@ -7,6 +7,7 @@ import { Navbar } from './components/Layout/Navbar';
 import { Footer } from './components/Layout/Footer';
 import { QuoteModal } from './components/QuoteModal';
 import { ScrollToTopButton } from './components/ScrollToTopButton';
+import { IntroLoader } from './components/IntroLoader';
 
 // Public Pages
 import { HomePage } from './pages/HomePage';
@@ -67,6 +68,7 @@ function PublicLayout() {
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-800 flex flex-col font-sans selection:bg-blue-600 selection:text-white relative">
+      <IntroLoader />
       <TopBar />
       <Navbar onOpenQuoteModal={() => handleOpenQuoteModal()} />
 

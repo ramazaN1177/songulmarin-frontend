@@ -1,152 +1,156 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  Heading, Type, List, Sparkles, Code, 
-  Plus, Trash2, Bold, Italic, AlignLeft, Globe
+  Heading, Type, List, Sparkles, 
+  Plus, Trash2, AlignLeft, Globe
 } from 'lucide-react';
 
+interface StructuredData {
+  heading: string;
+  subheading: string;
+  bodyText: string;
+  bulletPoints: string[];
+  calloutNote: string;
+}
+
 interface RichContentEditorProps {
-  value: string;
-  onChange: (htmlContent: string) => void;
+  value?: string;
+  onChange?: (htmlContent: string) => void;
+  valueTr?: string;
+  valueEn?: string;
+  onChangeTr?: (htmlContent: string) => void;
+  onChangeEn?: (htmlContent: string) => void;
   label?: string;
   helperText?: string;
   className?: string;
 }
 
+const parseHtmlToStructured = (html: string | undefined): StructuredData => {
+  if (!html) return { heading: '', subheading: '', bodyText: '', bulletPoints: [], calloutNote: '' };
+  const tempDiv = document.createElement('div');
+  tempDiv.innerHTML = html;
+
+  const heading = tempDiv.querySelector('h2')?.textContent || '';
+  const subheading = tempDiv.querySelector('.lead, h3, .subheading, p.text-lg')?.textContent || '';
+  
+  const paragraphs = Array.from(tempDiv.querySelectorAll('p'))
+    .map(p => p.textContent || '')
+    .filter(t => t.trim().length > 0 && !t.startsWith('•') && t !== subheading);
+
+  const bulletPoints = Array.from(tempDiv.querySelectorAll('li')).map(li => li.textContent || '');
+  const calloutNote = tempDiv.querySelector('.highlight, blockquote, .callout, div.bg-blue-50')?.textContent || '';
+
+  return {
+    heading,
+    subheading,
+    bodyText: paragraphs.join('\n\n'),
+    bulletPoints,
+    calloutNote: calloutNote.trim()
+  };
+};
+
+const buildHtmlFromStructured = (data: StructuredData): string => {
+  let html = '';
+
+  if (data.heading.trim()) {
+    html += `<h2 className="text-2xl font-bold text-slate-900 font-heading mb-4">${data.heading.trim()}</h2>\n`;
+  }
+
+  if (data.subheading.trim()) {
+    html += `<p className="text-lg font-medium text-blue-700 font-sans mb-6 leading-relaxed">${data.subheading.trim()}</p>\n`;
+  }
+
+  if (data.bodyText.trim()) {
+    const paras = data.bodyText.split('\n\n').filter(p => p.trim());
+    paras.forEach(p => {
+      html += `<p className="text-slate-700 text-sm sm:text-base leading-relaxed mb-4">${p.trim()}</p>\n`;
+    });
+  }
+
+  const validBullets = data.bulletPoints.filter(b => b.trim());
+  if (validBullets.length > 0) {
+    html += `<ul className="space-y-2.5 my-6 pl-2">\n`;
+    validBullets.forEach(item => {
+      html += `  <li className="flex items-start gap-2.5 text-slate-700 text-sm sm:text-base"><span className="w-2 h-2 rounded-full bg-blue-600 mt-2 shrink-0"></span><span>${item.trim()}</span></li>\n`;
+    });
+    html += `</ul>\n`;
+  }
+
+  if (data.calloutNote.trim()) {
+    html += `<div className="p-4 sm:p-5 rounded-2xl bg-blue-50/80 border-l-4 border-blue-600 text-blue-900 text-sm font-medium my-6 shadow-xs leading-relaxed">\n  ${data.calloutNote.trim()}\n</div>\n`;
+  }
+
+  return html.trim();
+};
+
 export const RichContentEditor: React.FC<RichContentEditorProps> = ({
   value,
   onChange,
-  label = 'Sayfa / Detay İçeriği',
-  helperText = 'Metinlerinizi ayrı alanlara yazarak otomatik biçimlendirin veya zengin içerik araçlarını kullanın.',
+  valueTr,
+  valueEn,
+  onChangeTr,
+  onChangeEn,
+  label = 'Detaylı İçerik Editörü',
+  helperText = 'Metin, madde listeleri ve vurgu kutularını Türkçe ve İngilizce olarak doldurun.',
   className = '',
 }) => {
-  const [activeTab, setActiveTab] = useState<'structured' | 'toolbar' | 'code'>('structured');
+  const [activeLang, setActiveLang] = useState<'tr' | 'en'>('tr');
 
-  // Structured Form States
-  const [heading, setHeading] = useState('');
-  const [subheading, setSubheading] = useState('');
-  const [bodyText, setBodyText] = useState('');
-  const [bulletPoints, setBulletPoints] = useState<string[]>([]);
-  const [calloutNote, setCalloutNote] = useState('');
+  const [dataTr, setDataTr] = useState<StructuredData>(() => parseHtmlToStructured(valueTr || value));
+  const [dataEn, setDataEn] = useState<StructuredData>(() => parseHtmlToStructured(valueEn));
 
-  // Helper to parse incoming HTML string into structured fields if possible
   useEffect(() => {
-    if (!value) return;
-
-    const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = value;
-
-    const h2 = tempDiv.querySelector('h2')?.textContent || '';
-    const h3Lead = tempDiv.querySelector('.lead, h3, .subheading')?.textContent || '';
-    
-    // Extract paragraphs
-    const paragraphs = Array.from(tempDiv.querySelectorAll('p'))
-      .map(p => p.textContent || '')
-      .filter(t => t.trim().length > 0 && !t.startsWith('•'));
-    
-    // Extract bullets
-    const bullets = Array.from(tempDiv.querySelectorAll('li')).map(li => li.textContent || '');
-    
-    // Extract callout
-    const callout = tempDiv.querySelector('.highlight, blockquote, .callout')?.textContent || '';
-
-    if (h2) setHeading(h2);
-    if (h3Lead) setSubheading(h3Lead);
-    if (paragraphs.length > 0) setBodyText(paragraphs.join('\n\n'));
-    if (bullets.length > 0) setBulletPoints(bullets);
-    if (callout) setCalloutNote(callout);
-  }, []);
-
-  // Generate clean HTML string matching corporate website styles
-  const buildHtmlFromStructured = (
-    h: string, 
-    sub: string, 
-    body: string, 
-    bullets: string[], 
-    callout: string
-  ) => {
-    let html = '';
-
-    if (h.trim()) {
-      html += `<h2 className="text-2xl font-bold text-slate-900 font-heading mb-4">${h.trim()}</h2>\n`;
+    if (valueTr !== undefined || value !== undefined) {
+      setDataTr(parseHtmlToStructured(valueTr || value));
     }
+  }, [valueTr, value]);
 
-    if (sub.trim()) {
-      html += `<p className="text-lg font-medium text-blue-700 font-sans mb-6 leading-relaxed">${sub.trim()}</p>\n`;
+  useEffect(() => {
+    if (valueEn !== undefined) {
+      setDataEn(parseHtmlToStructured(valueEn));
     }
+  }, [valueEn]);
 
-    if (body.trim()) {
-      const paras = body.split('\n\n').filter(p => p.trim());
-      paras.forEach(p => {
-        html += `<p className="text-slate-700 text-sm sm:text-base leading-relaxed mb-4">${p.trim()}</p>\n`;
-      });
+  const currentData = activeLang === 'tr' ? dataTr : dataEn;
+
+  const updateCurrentData = (updated: StructuredData) => {
+    if (activeLang === 'tr') {
+      setDataTr(updated);
+      const html = buildHtmlFromStructured(updated);
+      if (onChangeTr) onChangeTr(html);
+      if (onChange) onChange(html);
+    } else {
+      setDataEn(updated);
+      const html = buildHtmlFromStructured(updated);
+      if (onChangeEn) onChangeEn(html);
     }
-
-    const validBullets = bullets.filter(b => b.trim());
-    if (validBullets.length > 0) {
-      html += `<ul className="space-y-2.5 my-6 pl-2">\n`;
-      validBullets.forEach(item => {
-        html += `  <li className="flex items-start gap-2.5 text-slate-700 text-sm sm:text-base"><span className="w-2 h-2 rounded-full bg-blue-600 mt-2 shrink-0"></span><span>${item.trim()}</span></li>\n`;
-      });
-      html += `</ul>\n`;
-    }
-
-    if (callout.trim()) {
-      html += `<div className="p-4 sm:p-5 rounded-2xl bg-blue-50/80 border-l-4 border-blue-600 text-blue-900 text-sm font-medium my-6 shadow-xs leading-relaxed">\n  ${callout.trim()}\n</div>\n`;
-    }
-
-    return html.trim();
   };
 
-  const handleStructuredChange = (
-    newHeading = heading,
-    newSub = subheading,
-    newBody = bodyText,
-    newBullets = bulletPoints,
-    newCallout = calloutNote
-  ) => {
-    setHeading(newHeading);
-    setSubheading(newSub);
-    setBodyText(newBody);
-    setBulletPoints(newBullets);
-    setCalloutNote(newCallout);
-
-    const generatedHtml = buildHtmlFromStructured(newHeading, newSub, newBody, newBullets, newCallout);
-    onChange(generatedHtml);
+  const handleFieldChange = (field: keyof StructuredData, val: any) => {
+    const updated = { ...currentData, [field]: val };
+    updateCurrentData(updated);
   };
 
   const addBulletPoint = () => {
-    const updated = [...bulletPoints, ''];
-    handleStructuredChange(heading, subheading, bodyText, updated, calloutNote);
+    const updatedBullets = [...currentData.bulletPoints, ''];
+    handleFieldChange('bulletPoints', updatedBullets);
   };
 
   const updateBulletPoint = (index: number, val: string) => {
-    const updated = [...bulletPoints];
-    updated[index] = val;
-    handleStructuredChange(heading, subheading, bodyText, updated, calloutNote);
+    const updatedBullets = [...currentData.bulletPoints];
+    updatedBullets[index] = val;
+    handleFieldChange('bulletPoints', updatedBullets);
   };
 
   const removeBulletPoint = (index: number) => {
-    const updated = bulletPoints.filter((_, i) => i !== index);
-    handleStructuredChange(heading, subheading, bodyText, updated, calloutNote);
+    const updatedBullets = currentData.bulletPoints.filter((_, i) => i !== index);
+    handleFieldChange('bulletPoints', updatedBullets);
   };
 
-  // Quick HTML insertion helper for Toolbar mode
-  const insertTag = (startTag: string, endTag: string) => {
-    const textarea = document.getElementById('rich-textarea-code') as HTMLTextAreaElement;
-    if (!textarea) return;
-
-    const start = textarea.selectionStart;
-    const end = textarea.selectionEnd;
-    const selected = value.substring(start, end) || 'Örnek Metin';
-    const replacement = `${startTag}${selected}${endTag}`;
-
-    const newValue = value.substring(0, start) + replacement + value.substring(end);
-    onChange(newValue);
-  };
+  const currentPreviewHtml = buildHtmlFromStructured(currentData);
 
   return (
     <div className={`space-y-4 ${className}`}>
-      {/* Label & Tab Toggle Header */}
+      {/* Header & Language Tab Selector */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
         <div>
           <label className="block text-xs font-bold text-slate-900">
@@ -157,269 +161,170 @@ export const RichContentEditor: React.FC<RichContentEditorProps> = ({
           )}
         </div>
 
-        {/* Bright Light-Themed Tab Buttons */}
+        {/* TR / EN Language Toggle Buttons */}
         <div className="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200">
           <button
             type="button"
-            onClick={() => setActiveTab('structured')}
+            onClick={() => setActiveLang('tr')}
             className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5 ${
-              activeTab === 'structured'
+              activeLang === 'tr'
                 ? 'bg-white text-blue-700 shadow-xs border border-slate-200'
                 : 'text-slate-600 hover:text-slate-900'
             }`}
           >
-            <Sparkles className="w-3.5 h-3.5 text-blue-600" />
-            <span>Kolay Form Modu</span>
+            <span>🇹🇷 Türkçe (TR)</span>
           </button>
 
           <button
             type="button"
-            onClick={() => setActiveTab('toolbar')}
+            onClick={() => setActiveLang('en')}
             className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5 ${
-              activeTab === 'toolbar'
+              activeLang === 'en'
                 ? 'bg-white text-blue-700 shadow-xs border border-slate-200'
                 : 'text-slate-600 hover:text-slate-900'
             }`}
           >
-            <AlignLeft className="w-3.5 h-3.5" />
-            <span>Metin & Şablon</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setActiveTab('code')}
-            className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5 ${
-              activeTab === 'code'
-                ? 'bg-white text-blue-700 shadow-xs border border-slate-200'
-                : 'text-slate-600 hover:text-slate-900'
-            }`}
-          >
-            <Code className="w-3.5 h-3.5" />
-            <span>Ham HTML</span>
+            <span>🇬🇧 English (EN)</span>
           </button>
         </div>
       </div>
 
-      {/* TAB 1: STRUCTURED FORM INPUTS (Crisp Light Theme) */}
-      {activeTab === 'structured' && (
-        <div className="bg-slate-50/80 border border-slate-200/90 rounded-2xl p-5 sm:p-6 space-y-4 text-xs">
-          
-          {/* Main Heading Input */}
-          <div className="space-y-1">
-            <label className="font-bold text-slate-800 flex items-center gap-1.5">
-              <Heading className="w-4 h-4 text-blue-600" />
-              Ana Başlık Metni
-            </label>
-            <input
-              type="text"
-              value={heading}
-              onChange={(e) => handleStructuredChange(e.target.value, subheading, bodyText, bulletPoints, calloutNote)}
-              placeholder="Örn: Marina ve İmalat Çözümlerimiz"
-              className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-slate-900 font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600"
-            />
-          </div>
-
-          {/* Subheading Input */}
-          <div className="space-y-1">
-            <label className="font-bold text-slate-800 flex items-center gap-1.5">
-              <Type className="w-4 h-4 text-blue-600" />
-              Alt Başlık / Özet Girişi
-            </label>
-            <input
-              type="text"
-              value={subheading}
-              onChange={(e) => handleStructuredChange(heading, e.target.value, bodyText, bulletPoints, calloutNote)}
-              placeholder="Örn: Yüksek kapasiteli ağır yük taşıma ve marin vinç altyapısı."
-              className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600"
-            />
-          </div>
-
-          {/* Paragraphs Input */}
-          <div className="space-y-1">
-            <label className="font-bold text-slate-800 flex items-center gap-1.5">
-              <AlignLeft className="w-4 h-4 text-blue-600" />
-              Ana Açıklama Metni (Paragraflar)
-            </label>
-            <textarea
-              rows={5}
-              value={bodyText}
-              onChange={(e) => handleStructuredChange(heading, subheading, e.target.value, bulletPoints, calloutNote)}
-              placeholder="Açıklama paragrafını buraya yazın. İki satır boşluk bıraktığınızda yeni paragraf oluşturulur."
-              className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 leading-relaxed text-xs"
-            />
-          </div>
-
-          {/* Bullet Points Input List */}
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <label className="font-bold text-slate-800 flex items-center gap-1.5">
-                <List className="w-4 h-4 text-blue-600" />
-                Önemli Özellikler / Madde Listesi
-              </label>
-              <button
-                type="button"
-                onClick={addBulletPoint}
-                className="px-3 py-1.5 text-xs font-bold text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-lg border border-blue-200 flex items-center gap-1 transition-colors"
-              >
-                <Plus className="w-3.5 h-3.5" />
-                Madde Ekle
-              </button>
-            </div>
-
-            {bulletPoints.length === 0 ? (
-              <p className="text-xs text-slate-400 italic bg-white p-3 rounded-xl border border-slate-200">Henüz madde eklenmedi. Yukarıdaki "Madde Ekle" butonuna basarak ekleyebilirsiniz.</p>
-            ) : (
-              <div className="space-y-2">
-                {bulletPoints.map((point, index) => (
-                  <div key={index} className="flex items-center gap-2">
-                    <span className="w-2.5 h-2.5 rounded-full bg-blue-600 shrink-0" />
-                    <input
-                      type="text"
-                      value={point}
-                      onChange={(e) => updateBulletPoint(index, e.target.value)}
-                      placeholder={`Madde ${index + 1}`}
-                      className="flex-1 px-3.5 py-2 bg-white border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => removeBulletPoint(index)}
-                      className="p-2 text-slate-400 hover:text-rose-600 rounded-xl hover:bg-rose-50 border border-slate-200 hover:border-rose-200 transition-colors"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* Callout / Highlight Box */}
-          <div className="space-y-1 pt-2 border-t border-slate-200">
-            <label className="font-bold text-slate-800 flex items-center gap-1.5">
-              <Sparkles className="w-4 h-4 text-amber-500" />
-              Vurgulanan Önemli Not Kutusu (Opsiyonel)
-            </label>
-            <input
-              type="text"
-              value={calloutNote}
-              onChange={(e) => handleStructuredChange(heading, subheading, bodyText, bulletPoints, e.target.value)}
-              placeholder="Örn: Tüm ekipmanlarımız 2 Yıl Uluslararası Üretici Garantisi kapsamındadır."
-              className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600"
-            />
-          </div>
-
+      {/* STRUCTURED FORM INPUTS */}
+      <div className="bg-slate-50/80 border border-slate-200/90 rounded-2xl p-5 sm:p-6 space-y-4 text-xs">
+        
+        {/* Language Indicator Banner */}
+        <div className="flex items-center gap-2 text-[11px] font-bold text-slate-600 bg-white p-2.5 rounded-xl border border-slate-200">
+          {activeLang === 'tr' ? (
+            <span className="text-blue-700">🇹🇷 Türkçe içerik alanlarını düzenliyorsunuz:</span>
+          ) : (
+            <span className="text-blue-700">🇬🇧 İngilizce (English) içerik alanlarını düzenliyorsunuz:</span>
+          )}
         </div>
-      )}
 
-      {/* TAB 2: TOOLBAR QUICK FORMATTING BUTTONS */}
-      {activeTab === 'toolbar' && (
-        <div className="bg-slate-50/80 border border-slate-200/90 rounded-2xl p-4 space-y-3 text-xs">
-          
-          {/* Format Toolbar */}
-          <div className="flex flex-wrap gap-1.5 bg-white p-2 rounded-xl border border-slate-200 shadow-xs">
-            <button
-              type="button"
-              onClick={() => insertTag('<h2>', '</h2>')}
-              className="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-blue-50 text-slate-700 hover:text-blue-700 font-bold flex items-center gap-1 border border-slate-200"
-              title="Başlık Ekle (H2)"
-            >
-              <Heading className="w-3.5 h-3.5" />
-              Başlık
-            </button>
-            <button
-              type="button"
-              onClick={() => insertTag('<p>', '</p>')}
-              className="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-blue-50 text-slate-700 hover:text-blue-700 font-medium flex items-center gap-1 border border-slate-200"
-              title="Paragraf Ekle (P)"
-            >
-              <AlignLeft className="w-3.5 h-3.5" />
-              Paragraf
-            </button>
-            <button
-              type="button"
-              onClick={() => insertTag('<strong>', '</strong>')}
-              className="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-blue-50 text-slate-700 hover:text-blue-700 font-bold flex items-center gap-1 border border-slate-200"
-              title="Kalın Metin"
-            >
-              <Bold className="w-3.5 h-3.5" />
-              Kalın
-            </button>
-            <button
-              type="button"
-              onClick={() => insertTag('<em>', '</em>')}
-              className="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-blue-50 text-slate-700 hover:text-blue-700 italic flex items-center gap-1 border border-slate-200"
-              title="İtalik Metin"
-            >
-              <Italic className="w-3.5 h-3.5" />
-              İtalik
-            </button>
-            <button
-              type="button"
-              onClick={() => insertTag('<ul>\n  <li>', '</li>\n</ul>')}
-              className="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-blue-50 text-slate-700 hover:text-blue-700 font-medium flex items-center gap-1 border border-slate-200"
-              title="Liste Ekle"
-            >
-              <List className="w-3.5 h-3.5" />
-              Liste
-            </button>
-            <button
-              type="button"
-              onClick={() => insertTag('<div className="p-4 rounded-xl bg-blue-50 border-l-4 border-blue-600 font-bold text-blue-900">\n  ', '\n</div>')}
-              className="px-3 py-1.5 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-800 font-bold flex items-center gap-1 border border-amber-200"
-              title="Vurgu Kutusu"
-            >
-              <Sparkles className="w-3.5 h-3.5 text-amber-600" />
-              Vurgu Kutusu
-            </button>
-          </div>
-
-          <textarea
-            id="rich-textarea-code"
-            rows={8}
-            value={value}
-            onChange={(e) => onChange(e.target.value)}
-            className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-slate-900 font-mono text-xs leading-relaxed focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600"
+        {/* Main Heading Input */}
+        <div className="space-y-1">
+          <label className="font-bold text-slate-800 flex items-center gap-1.5">
+            <Heading className="w-4 h-4 text-blue-600" />
+            {activeLang === 'tr' ? 'Ana Başlık Metni (TR)' : 'Main Heading Text (EN)'}
+          </label>
+          <input
+            type="text"
+            value={currentData.heading}
+            onChange={(e) => handleFieldChange('heading', e.target.value)}
+            placeholder={activeLang === 'tr' ? 'Örn: Marina ve İmalat Çözümlerimiz' : 'e.g., Marine & Shipyard Solutions'}
+            className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-slate-900 font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600"
           />
         </div>
-      )}
 
-      {/* TAB 3: RAW HTML CODE */}
-      {activeTab === 'code' && (
+        {/* Subheading Input */}
+        <div className="space-y-1">
+          <label className="font-bold text-slate-800 flex items-center gap-1.5">
+            <Type className="w-4 h-4 text-blue-600" />
+            {activeLang === 'tr' ? 'Alt Başlık / Özet Girişi (TR)' : 'Subheading / Lead Summary (EN)'}
+          </label>
+          <input
+            type="text"
+            value={currentData.subheading}
+            onChange={(e) => handleFieldChange('subheading', e.target.value)}
+            placeholder={activeLang === 'tr' ? 'Örn: Yüksek kapasiteli ağır yük taşıma altyapısı' : 'e.g., Heavy-duty mobile boat hoist infrastructure'}
+            className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600"
+          />
+        </div>
+
+        {/* Paragraphs Input */}
+        <div className="space-y-1">
+          <label className="font-bold text-slate-800 flex items-center gap-1.5">
+            <AlignLeft className="w-4 h-4 text-blue-600" />
+            {activeLang === 'tr' ? 'Ana Açıklama Metni (Paragraflar)' : 'Main Description Text (Paragraphs)'}
+          </label>
+          <textarea
+            rows={5}
+            value={currentData.bodyText}
+            onChange={(e) => handleFieldChange('bodyText', e.target.value)}
+            placeholder={activeLang === 'tr' ? 'Açıklama paragrafını buraya yazın. İki satır boşluk bıraktığınızda yeni paragraf oluşturulur.' : 'Enter description paragraphs. Leave an empty line between paragraphs.'}
+            className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 leading-relaxed text-xs"
+          />
+        </div>
+
+        {/* Bullet Points Input List */}
         <div className="space-y-2">
-          <textarea
-            rows={8}
-            value={value}
-            onChange={(e) => onChange(e.target.value)}
-            placeholder="<html> veya metin içeriğinizi girin..."
-            className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-slate-900 font-mono text-xs leading-relaxed focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600"
+          <div className="flex items-center justify-between">
+            <label className="font-bold text-slate-800 flex items-center gap-1.5">
+              <List className="w-4 h-4 text-blue-600" />
+              {activeLang === 'tr' ? 'Önemli Özellikler / Madde Listesi' : 'Key Features / Bullet Points List'}
+            </label>
+            <button
+              type="button"
+              onClick={addBulletPoint}
+              className="px-3 py-1.5 text-xs font-bold text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-lg border border-blue-200 flex items-center gap-1 transition-colors"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              {activeLang === 'tr' ? 'Madde Ekle' : 'Add Bullet'}
+            </button>
+          </div>
+
+          {currentData.bulletPoints.length === 0 ? (
+            <p className="text-xs text-slate-400 italic bg-white p-3 rounded-xl border border-slate-200">
+              {activeLang === 'tr' ? 'Henüz madde eklenmedi. Yukarıdaki "Madde Ekle" butonuna basarak ekleyebilirsiniz.' : 'No bullet items added yet. Click "Add Bullet" above.'}
+            </p>
+          ) : (
+            <div className="space-y-2">
+              {currentData.bulletPoints.map((point, index) => (
+                <div key={index} className="flex items-center gap-2">
+                  <span className="w-2.5 h-2.5 rounded-full bg-blue-600 shrink-0" />
+                  <input
+                    type="text"
+                    value={point}
+                    onChange={(e) => updateBulletPoint(index, e.target.value)}
+                    placeholder={activeLang === 'tr' ? `Madde ${index + 1}` : `Bullet point ${index + 1}`}
+                    className="flex-1 px-3.5 py-2 bg-white border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => removeBulletPoint(index)}
+                    className="p-2 text-slate-400 hover:text-rose-600 rounded-xl hover:bg-rose-50 border border-slate-200 hover:border-rose-200 transition-colors"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Callout / Highlight Box */}
+        <div className="space-y-1 pt-2 border-t border-slate-200">
+          <label className="font-bold text-slate-800 flex items-center gap-1.5">
+            <Sparkles className="w-4 h-4 text-amber-500" />
+            {activeLang === 'tr' ? 'Vurgulanan Önemli Not Kutusu (Opsiyonel)' : 'Highlight Note Box (Optional)'}
+          </label>
+          <input
+            type="text"
+            value={currentData.calloutNote}
+            onChange={(e) => handleFieldChange('calloutNote', e.target.value)}
+            placeholder={activeLang === 'tr' ? 'Örn: Tüm ekipmanlarımız 2 Yıl Uluslararası Garanti kapsamındadır.' : 'e.g., Covered under 2-Year International Warranty.'}
+            className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600"
           />
         </div>
-      )}
 
-      {/* LIVE WEBSITE PREVIEW FRAME */}
-      {value && (
-        <div className="mt-6 space-y-2">
-          {/* Preview Header Banner */}
-          <div className="flex items-center justify-between px-4 py-2.5 rounded-t-2xl bg-blue-900 text-white border border-blue-900 shadow-xs">
-            <div className="flex items-center gap-2 text-xs font-bold">
+      </div>
+
+      {/* LIVE PREVIEW FRAME */}
+      {currentPreviewHtml && (
+        <div className="mt-4 space-y-2">
+          <div className="flex items-center justify-between px-4 py-2 rounded-t-2xl bg-blue-900 text-white text-xs font-bold">
+            <div className="flex items-center gap-2">
               <Globe className="w-4 h-4 text-sky-400" />
-              <span>Web Sitesi Canlı Önizlemesi (Müşterilerin Göreceği Birebir Görünüm)</span>
+              <span>
+                {activeLang === 'tr' ? 'Web Sitesi Canlı Türkçe Önizlemesi' : 'Live English Preview'}
+              </span>
             </div>
-            <span className="text-[10px] font-mono text-blue-200 bg-white/10 px-2 py-0.5 rounded border border-white/20">
-              songurmarin.com
-            </span>
           </div>
-
-          {/* Exact Replica of Corporate Page Content Body Card */}
-          <div className="bg-white border border-slate-200 rounded-b-2xl p-6 sm:p-10 shadow-sm text-slate-800 text-base leading-relaxed space-y-6">
-            <div 
-              className="space-y-4"
-              dangerouslySetInnerHTML={{ __html: value }} 
-            />
+          <div className="bg-white border border-slate-200 rounded-b-2xl p-6 shadow-sm text-slate-800 text-sm leading-relaxed">
+            <div dangerouslySetInnerHTML={{ __html: currentPreviewHtml }} />
           </div>
         </div>
       )}
-
     </div>
   );
 };

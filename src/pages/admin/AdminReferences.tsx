@@ -192,14 +192,48 @@ export const AdminReferences: React.FC = () => {
               />
             </div>
 
-            <div className="space-y-1">
-              <label className="font-bold text-slate-700 block">Proje / Teslimat Başlığı (TR)</label>
-              <input
-                type="text"
-                value={editingRef.titleTr || ''}
-                onChange={(e) => setEditingRef({ ...editingRef, titleTr: e.target.value })}
-                className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-200 focus:outline-none focus:border-blue-600 text-slate-900"
-              />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-1">
+                <label className="font-bold text-slate-700 block">Proje / Teslimat Başlığı (TR)</label>
+                <input
+                  type="text"
+                  value={editingRef.titleTr || ''}
+                  onChange={(e) => setEditingRef({ ...editingRef, titleTr: e.target.value })}
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-200 focus:outline-none focus:border-blue-600 text-slate-900"
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="font-bold text-slate-700 block">Project Title (EN)</label>
+                <input
+                  type="text"
+                  value={editingRef.titleEn || ''}
+                  onChange={(e) => setEditingRef({ ...editingRef, titleEn: e.target.value })}
+                  placeholder="e.g. Marina Boat Hoist Delivery"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-200 focus:outline-none focus:border-blue-600 text-slate-900"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-1">
+                <label className="font-bold text-slate-700 block">Açıklama (TR)</label>
+                <textarea
+                  rows={2}
+                  value={editingRef.descriptionTr || ''}
+                  onChange={(e) => setEditingRef({ ...editingRef, descriptionTr: e.target.value })}
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-200 focus:outline-none focus:border-blue-600 text-slate-900"
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="font-bold text-slate-700 block">Description (EN)</label>
+                <textarea
+                  rows={2}
+                  value={editingRef.descriptionEn || ''}
+                  onChange={(e) => setEditingRef({ ...editingRef, descriptionEn: e.target.value })}
+                  placeholder="Project details in English"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-200 focus:outline-none focus:border-blue-600 text-slate-900"
+                />
+              </div>
             </div>
 
             <div>

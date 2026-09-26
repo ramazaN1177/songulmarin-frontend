@@ -240,7 +240,8 @@ export const apiService = {
 
   // Admin Pages
   updatePage: async (id: number, data: Partial<Page>): Promise<Page> => {
-    const res = await api.put(`/admin/pages/${id}`, data);
+    const identifier = data.slug || id;
+    const res = await api.put(`/admin/pages/${identifier}`, data);
     return res.data;
   },
 

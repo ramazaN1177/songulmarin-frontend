@@ -474,22 +474,36 @@ export const AdminProducts: React.FC = () => {
               />
             </div>
 
-            <div className="space-y-1">
-              <label className="font-bold text-slate-800 block">Özet Açıklama (TR)</label>
-              <textarea
-                rows={2}
-                value={editingProduct.summaryTr || ''}
-                onChange={(e) => setEditingProduct({ ...editingProduct, summaryTr: e.target.value })}
-                className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-200 text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500/20"
-              />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-1">
+                <label className="font-bold text-slate-800 block">Özet Açıklama (TR)</label>
+                <textarea
+                  rows={2}
+                  value={editingProduct.summaryTr || ''}
+                  onChange={(e) => setEditingProduct({ ...editingProduct, summaryTr: e.target.value })}
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-200 text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500/20"
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="font-bold text-slate-800 block">Summary Description (EN)</label>
+                <textarea
+                  rows={2}
+                  value={editingProduct.summaryEn || ''}
+                  onChange={(e) => setEditingProduct({ ...editingProduct, summaryEn: e.target.value })}
+                  placeholder="Short summary in English"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-200 text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500/20"
+                />
+              </div>
             </div>
 
             <div>
               <RichContentEditor
-                label="Detaylı Açıklama / Özellikler"
-                value={editingProduct.contentTr || ''}
-                onChange={(html) => setEditingProduct({ ...editingProduct, contentTr: html })}
-                helperText="Ürün açıklaması, teknik detaylar ve maddeli özellikleri kolay form alanlarında doldurun."
+                label="Detaylı Açıklama / Özellikler (TR & EN)"
+                valueTr={editingProduct.contentTr || ''}
+                valueEn={editingProduct.contentEn || ''}
+                onChangeTr={(html) => setEditingProduct((prev) => prev ? { ...prev, contentTr: html } : null)}
+                onChangeEn={(html) => setEditingProduct((prev) => prev ? { ...prev, contentEn: html } : null)}
+                helperText="Ürün açıklaması ve teknik detayları Türkçe ve İngilizce sekmelerinden doldurun."
               />
             </div>
 

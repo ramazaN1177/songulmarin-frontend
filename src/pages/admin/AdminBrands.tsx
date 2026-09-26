@@ -206,14 +206,26 @@ export const AdminBrands: React.FC = () => {
               />
             </div>
 
-            <div className="space-y-1">
-              <label className="font-bold text-slate-800 block">Açıklama (TR)</label>
-              <textarea
-                rows={3}
-                value={editingBrand.descriptionTr || ''}
-                onChange={(e) => setEditingBrand({ ...editingBrand, descriptionTr: e.target.value })}
-                className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-200 text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500/20"
-              />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-1">
+                <label className="font-bold text-slate-800 block">Açıklama (TR)</label>
+                <textarea
+                  rows={3}
+                  value={editingBrand.descriptionTr || ''}
+                  onChange={(e) => setEditingBrand({ ...editingBrand, descriptionTr: e.target.value })}
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-200 text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500/20"
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="font-bold text-slate-800 block">Description (EN)</label>
+                <textarea
+                  rows={3}
+                  value={editingBrand.descriptionEn || ''}
+                  onChange={(e) => setEditingBrand({ ...editingBrand, descriptionEn: e.target.value })}
+                  placeholder="Brand description in English"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-200 text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500/20"
+                />
+              </div>
             </div>
 
             <div className="flex items-center gap-6 pt-2">

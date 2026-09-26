@@ -305,9 +305,9 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenQuoteModal }) => {
             </div>
 
             <div className="pt-4 lg:pt-0 lg:px-4 space-y-1">
-              <span className="text-3xl sm:text-4xl font-extrabold text-blue-700 font-heading">1000 Ton</span>
-              <p className="text-sm font-bold text-slate-900">Maks. Kaldırma Kapasitesi</p>
-              <p className="text-xs text-slate-600">Mobil Boat Hoist & Vinç</p>
+              <span className="text-3xl sm:text-4xl font-extrabold text-blue-700 font-heading">{t('maxCapVal')}</span>
+              <p className="text-sm font-bold text-slate-900">{t('maxCapLabel')}</p>
+              <p className="text-xs text-slate-600">{t('maxCapSub')}</p>
             </div>
 
             <div className="pt-4 lg:pt-0 lg:px-4 space-y-1">
@@ -339,8 +339,8 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenQuoteModal }) => {
                     <Award className="w-6 h-6" />
                   </div>
                   <div>
-                    <h4 className="text-slate-900 font-bold text-sm">Temsilcilik & Distribütörlük</h4>
-                    <p className="text-xs text-slate-500">Uluslararası Yetkili Temsilcilik</p>
+                    <h4 className="text-slate-900 font-bold text-sm">{t('representationTitle')}</h4>
+                    <p className="text-xs text-slate-500">{t('representationSub')}</p>
                   </div>
                 </div>
               </div>
@@ -351,24 +351,24 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenQuoteModal }) => {
                 <span>Songur Marin Makine</span>
               </div>
               <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 font-heading leading-tight">
-                Marina & Tersaneler İçin Uçtan Uca Mühendislik Çözümleri
+                {t('aboutTitle')}
               </h2>
               <p className="text-slate-600 text-sm sm:text-base leading-relaxed">
-                25 yılı aşkın tecrübemizle, marin vinçleri, mobil boat hoist, bot taşıyıcılar ve ağır sanayi kaldırma ekipmanlarında Türkiye ve çevre coğrafyanın öncü firması olarak hizmet veriyoruz.
+                {t('aboutDesc')}
               </p>
               
               <div className="space-y-3 pt-2">
                 <div className="flex items-start gap-3 text-sm text-slate-700">
                   <CheckCircle2 className="w-5 h-5 text-blue-600 shrink-0 mt-0.5" />
-                  <span><strong>Satış Öncesi Projelendirme:</strong> Rıhtım ölçüleri ve havuz yapısına uygun vinç seçimi.</span>
+                  <span>{t('aboutFeature1')}</span>
                 </div>
                 <div className="flex items-start gap-3 text-sm text-slate-700">
                   <CheckCircle2 className="w-5 h-5 text-blue-600 shrink-0 mt-0.5" />
-                  <span><strong>Orijinal Yedek Parça:</strong> Stoktan hızlı yedek parça temini ve garanti.</span>
+                  <span>{t('aboutFeature2')}</span>
                 </div>
                 <div className="flex items-start gap-3 text-sm text-slate-700">
                   <CheckCircle2 className="w-5 h-5 text-blue-600 shrink-0 mt-0.5" />
-                  <span><strong>Sertifikalı Yük Testi:</strong> Yıllık SWL ağırlık testi ve periyodik bakım raporlaması.</span>
+                  <span>{t('aboutFeature3')}</span>
                 </div>
               </div>
 
@@ -454,7 +454,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenQuoteModal }) => {
                   to={`/markalar/${brand.slug}`}
                   className="inline-flex items-center gap-2 text-xs font-bold text-blue-700 hover:text-blue-900 transition-colors group"
                 >
-                  <span>Marka Ürünlerini Gör</span>
+                  <span>{t('viewBrandProducts')}</span>
                   <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
                 </Link>
               </div>

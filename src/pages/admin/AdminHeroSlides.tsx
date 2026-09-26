@@ -185,25 +185,72 @@ export const AdminHeroSlides: React.FC = () => {
           maxWidth="lg"
         >
           <form onSubmit={handleSave} className="space-y-4 text-xs">
-            <div className="space-y-1">
-              <label className="font-bold text-slate-800 block">Slayt Başlığı (TR)*</label>
-              <input
-                type="text"
-                value={editingSlide.titleTr || ''}
-                onChange={(e) => setEditingSlide({ ...editingSlide, titleTr: e.target.value })}
-                required
-                className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-200 text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500/20"
-              />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-1">
+                <label className="font-bold text-slate-800 block">Slayt Başlığı (TR)*</label>
+                <input
+                  type="text"
+                  value={editingSlide.titleTr || ''}
+                  onChange={(e) => setEditingSlide({ ...editingSlide, titleTr: e.target.value })}
+                  required
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-200 text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500/20"
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="font-bold text-slate-800 block">Slide Title (EN)</label>
+                <input
+                  type="text"
+                  value={editingSlide.titleEn || ''}
+                  onChange={(e) => setEditingSlide({ ...editingSlide, titleEn: e.target.value })}
+                  placeholder="e.g. World-Class Marine Hoists"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-200 text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500/20"
+                />
+              </div>
             </div>
 
-            <div className="space-y-1">
-              <label className="font-bold text-slate-800 block">Alt Açıklama (TR)</label>
-              <textarea
-                rows={2}
-                value={editingSlide.subtitleTr || ''}
-                onChange={(e) => setEditingSlide({ ...editingSlide, subtitleTr: e.target.value })}
-                className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-200 text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500/20"
-              />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-1">
+                <label className="font-bold text-slate-800 block">Alt Açıklama (TR)</label>
+                <textarea
+                  rows={2}
+                  value={editingSlide.subtitleTr || ''}
+                  onChange={(e) => setEditingSlide({ ...editingSlide, subtitleTr: e.target.value })}
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-200 text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500/20"
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="font-bold text-slate-800 block">Subtitle (EN)</label>
+                <textarea
+                  rows={2}
+                  value={editingSlide.subtitleEn || ''}
+                  onChange={(e) => setEditingSlide({ ...editingSlide, subtitleEn: e.target.value })}
+                  placeholder="Slide subtitle in English"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-200 text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500/20"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-1">
+                <label className="font-bold text-slate-800 block">Buton Metni (TR)</label>
+                <input
+                  type="text"
+                  value={editingSlide.buttonTextTr || ''}
+                  onChange={(e) => setEditingSlide({ ...editingSlide, buttonTextTr: e.target.value })}
+                  placeholder="Örn: Ürünlerimizi Keşfedin"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-200 text-slate-900 focus:outline-none focus:border-blue-600 font-semibold"
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="font-bold text-slate-800 block">Button Text (EN)</label>
+                <input
+                  type="text"
+                  value={editingSlide.buttonTextEn || ''}
+                  onChange={(e) => setEditingSlide({ ...editingSlide, buttonTextEn: e.target.value })}
+                  placeholder="e.g. Discover Our Products"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-200 text-slate-900 focus:outline-none focus:border-blue-600 font-semibold"
+                />
+              </div>
             </div>
 
             <div>

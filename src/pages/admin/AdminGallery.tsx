@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Trash2, Save, Play } from 'lucide-react';
+import { Plus, Edit3, Trash2, Save, Play } from 'lucide-react';
 import { apiService } from '../../api/client';
 import { ImageUploader } from '../../components/admin/ImageUploader';
 import { Modal } from '../../components/common/Modal';
@@ -36,6 +36,12 @@ export const AdminGallery: React.FC = () => {
       orderIndex: items.length + 1,
       isActive: true
     });
+    setSelectedFile(null);
+    setIsModalOpen(true);
+  };
+
+  const handleOpenEditModal = (item: GalleryItem) => {
+    setEditingItem({ ...item });
     setSelectedFile(null);
     setIsModalOpen(true);
   };
@@ -156,19 +162,29 @@ export const AdminGallery: React.FC = () => {
 
               <div className="px-4 pb-4 pt-1 border-t border-slate-100 flex items-center justify-between">
                 <span className="text-[10px] font-mono text-slate-400">{item.type}</span>
-                <button
-                  onClick={() => handleDelete(item.id)}
-                  className="p-1.5 rounded-lg bg-slate-100 hover:bg-rose-50 text-slate-600 hover:text-rose-600 transition-colors"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => handleOpenEditModal(item)}
+                    className="p-1.5 rounded-lg bg-slate-100 hover:bg-blue-50 text-slate-600 hover:text-blue-700 transition-colors"
+                    title="Düzenle"
+                  >
+                    <Edit3 className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => handleDelete(item.id)}
+                    className="p-1.5 rounded-lg bg-slate-100 hover:bg-rose-50 text-slate-600 hover:text-rose-600 transition-colors"
+                    title="Sil"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
             </div>
           ))}
         </div>
       )}
 
-      {/* Add Modal */}
+      {/* Add / Edit Modal */}
       {editingItem && (
         <Modal
           isOpen={isModalOpen}
@@ -179,14 +195,27 @@ export const AdminGallery: React.FC = () => {
           maxWidth="lg"
         >
           <form onSubmit={handleSave} className="space-y-4 text-xs">
-            <div className="space-y-1">
-              <label className="font-bold text-slate-800 block">Medya Başlığı (TR)</label>
-              <input
-                type="text"
-                value={editingItem.titleTr || ''}
-                onChange={(e) => setEditingItem({ ...editingItem, titleTr: e.target.value })}
-                className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-200 text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500/20"
-              />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-1">
+                <label className="font-bold text-slate-800 block">Medya Başlığı (TR)</label>
+                <input
+                  type="text"
+                  value={editingItem.titleTr || ''}
+                  onChange={(e) => setEditingItem({ ...editingItem, titleTr: e.target.value })}
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-200 text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500/20"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="font-bold text-slate-800 block">Media Title (EN)</label>
+                <input
+                  type="text"
+                  value={editingItem.titleEn || ''}
+                  onChange={(e) => setEditingItem({ ...editingItem, titleEn: e.target.value })}
+                  placeholder="e.g. Boat Hoist Operation"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-200 text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500/20"
+                />
+              </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">

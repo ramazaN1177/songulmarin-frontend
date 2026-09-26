@@ -1,5 +1,6 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import type { Language } from '../types';
+import { apiService } from '../api/client';
 
 interface Translations {
   [key: string]: {
@@ -79,6 +80,19 @@ const translations: Translations = {
   formMessage: { tr: 'Mesajınız / Proje Detayları', en: 'Your Message / Project Details' },
   formSend: { tr: 'Formu Gönder', en: 'Submit Request' },
   formSuccess: { tr: 'Talebiniz başarıyla iletildi. En kısa sürede sizinle iletişime geçeceğiz.', en: 'Your request has been sent successfully. We will get back to you shortly.' },
+
+  // About & Home Teaser
+  aboutTitle: { tr: 'Marina & Tersaneler İçin Uçtan Uca Mühendislik Çözümleri', en: 'End-to-End Engineering Solutions for Marinas & Shipyards' },
+  aboutDesc: { tr: '25 yılı aşkın tecrübemizle, marin vinçleri, mobil boat hoist, bot taşıyıcılar ve ağır sanayi kaldırma ekipmanlarında Türkiye ve çevre coğrafyanın öncü firması olarak hizmet veriyoruz.', en: 'With over 25 years of experience, we serve as the leading company in Turkey and surrounding regions for marine cranes, mobile boat hoists, boat transporters, and heavy industrial lifting equipment.' },
+  aboutFeature1: { tr: 'Satış Öncesi Projelendirme: Rıhtım ölçüleri ve havuz yapısına uygun vinç seçimi.', en: 'Pre-Sale Engineering: Crane selection tailored to dock dimensions and basin layout.' },
+  aboutFeature2: { tr: 'Orijinal Yedek Parça: Stoktan hızlı yedek parça temini ve garanti.', en: 'Original Spare Parts: Fast spare parts delivery from stock with warranty.' },
+  aboutFeature3: { tr: 'Sertifikalı Yük Testi: Yıllık SWL ağırlık testi ve periyodik bakım raporlaması.', en: 'Certified Load Testing: Annual SWL load testing and periodic maintenance reporting.' },
+  maxCapVal: { tr: '1000 Ton', en: '1000 Tons' },
+  maxCapLabel: { tr: 'Maks. Kaldırma Kapasitesi', en: 'Max Lifting Capacity' },
+  maxCapSub: { tr: 'Mobil Boat Hoist & Vinç', en: 'Mobile Boat Hoist & Crane' },
+  viewBrandProducts: { tr: 'Marka Ürünlerini Gör', en: 'View Brand Products' },
+  representationTitle: { tr: 'Temsilcilik & Distribütörlük', en: 'Representation & Distributorship' },
+  representationSub: { tr: 'Uluslararası Yetkili Temsilcilik', en: 'International Authorized Representation' },
 };
 
 interface LanguageContextType {
@@ -96,12 +110,42 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     return saved || 'tr';
   });
 
+  const [dynamicSettings, setDynamicSettings] = useState<Record<string, { tr: string; en: string }>>({});
+
+  useEffect(() => {
+    apiService.getSettings().then((settings) => {
+      if (Array.isArray(settings)) {
+        const map: Record<string, { tr: string; en: string }> = {};
+        settings.forEach((s) => {
+          map[s.key] = {
+            tr: s.valueTr || '',
+            en: s.valueEn || s.valueTr || ''
+          };
+        });
+        setDynamicSettings(map);
+      }
+    }).catch(() => {});
+  }, []);
+
   const setLanguage = (lang: Language) => {
     setLanguageState(lang);
     localStorage.setItem('smm_lang', lang);
   };
 
   const t = (key: string): string => {
+    const settingKeyMap: Record<string, string> = {
+      phone: 'phone',
+      email: 'email',
+      addressHeader: 'address',
+      workingHours: 'working_hours'
+    };
+
+    const sKey = settingKeyMap[key];
+    if (sKey && dynamicSettings[sKey]) {
+      const val = dynamicSettings[sKey][language] || dynamicSettings[sKey].tr;
+      if (val) return val;
+    }
+
     if (translations[key]) {
       return translations[key][language] || translations[key].tr || key;
     }

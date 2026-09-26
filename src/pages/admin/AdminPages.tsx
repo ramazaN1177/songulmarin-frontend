@@ -9,8 +9,10 @@ export const AdminPages: React.FC = () => {
   const [pages, setPages] = useState<Page[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedPage, setSelectedPage] = useState<Page | null>(null);
-  const [editingContent, setEditingContent] = useState('');
-  const [editingSummary, setEditingSummary] = useState('');
+  const [editingContentTr, setEditingContentTr] = useState('');
+  const [editingContentEn, setEditingContentEn] = useState('');
+  const [editingSummaryTr, setEditingSummaryTr] = useState('');
+  const [editingSummaryEn, setEditingSummaryEn] = useState('');
   const [editingImage, setEditingImage] = useState('');
   const [saving, setSaving] = useState(false);
   const [savedMessage, setSavedMessage] = useState(false);
@@ -36,8 +38,10 @@ export const AdminPages: React.FC = () => {
 
   const handleSelectPage = (page: Page) => {
     setSelectedPage(page);
-    setEditingContent(page.contentTr || '');
-    setEditingSummary(page.summaryTr || '');
+    setEditingContentTr(page.contentTr || '');
+    setEditingContentEn(page.contentEn || '');
+    setEditingSummaryTr(page.summaryTr || '');
+    setEditingSummaryEn(page.summaryEn || '');
     setEditingImage(page.imageUrl || '');
     setSavedMessage(false);
   };
@@ -52,8 +56,10 @@ export const AdminPages: React.FC = () => {
     try {
       const updated = await apiService.updatePage(selectedPage.id, {
         ...selectedPage,
-        contentTr: editingContent,
-        summaryTr: editingSummary,
+        contentTr: editingContentTr,
+        contentEn: editingContentEn,
+        summaryTr: editingSummaryTr,
+        summaryEn: editingSummaryEn,
         imageUrl: editingImage
       });
       setPages(pages.map(p => p.id === updated.id ? updated : p));
@@ -62,8 +68,10 @@ export const AdminPages: React.FC = () => {
     } catch {
       const updated: Page = {
         ...selectedPage,
-        contentTr: editingContent,
-        summaryTr: editingSummary,
+        contentTr: editingContentTr,
+        contentEn: editingContentEn,
+        summaryTr: editingSummaryTr,
+        summaryEn: editingSummaryEn,
         imageUrl: editingImage
       };
       setPages(pages.map(p => p.id === selectedPage.id ? updated : p));
@@ -201,27 +209,44 @@ export const AdminPages: React.FC = () => {
                   />
                 </div>
 
-                {/* Summary Field */}
-                <div className="space-y-1.5">
-                  <label className="font-bold text-slate-800 block text-xs">
-                    Sayfa Özet Açıklaması (TR)
-                  </label>
-                  <textarea
-                    rows={2}
-                    value={editingSummary}
-                    onChange={(e) => setEditingSummary(e.target.value)}
-                    placeholder="Sayfa başlığının hemen altında yer alan kısa özet cümlesi..."
-                    className="w-full px-4 py-3 rounded-xl bg-white border border-slate-200 text-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition-all leading-relaxed"
-                  />
+                {/* Summary Fields Grid TR & EN */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <label className="font-bold text-slate-800 block text-xs">
+                      Sayfa Özet Açıklaması (TR)
+                    </label>
+                    <textarea
+                      rows={2}
+                      value={editingSummaryTr}
+                      onChange={(e) => setEditingSummaryTr(e.target.value)}
+                      placeholder="Sayfa başlığının hemen altında yer alan kısa özet cümlesi..."
+                      className="w-full px-4 py-3 rounded-xl bg-white border border-slate-200 text-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition-all leading-relaxed"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="font-bold text-slate-800 block text-xs">
+                      Page Summary Description (EN)
+                    </label>
+                    <textarea
+                      rows={2}
+                      value={editingSummaryEn}
+                      onChange={(e) => setEditingSummaryEn(e.target.value)}
+                      placeholder="Page lead summary sentence in English..."
+                      className="w-full px-4 py-3 rounded-xl bg-white border border-slate-200 text-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition-all leading-relaxed"
+                    />
+                  </div>
                 </div>
 
-                {/* Rich Content Editor */}
+                {/* Dual-Language Rich Content Editor */}
                 <div>
                   <RichContentEditor
-                    label="Sayfa İçeriği Metin Düzenleyici"
-                    value={editingContent}
-                    onChange={(html) => setEditingContent(html)}
-                    helperText="Başlık, alt başlık, açıklama metni ve maddelerinizi kolay form alanlarına yazarak otomatik biçimlendirin."
+                    label="Sayfa İçeriği Metin Düzenleyici (TR & EN)"
+                    valueTr={editingContentTr}
+                    valueEn={editingContentEn}
+                    onChangeTr={(html) => setEditingContentTr(html)}
+                    onChangeEn={(html) => setEditingContentEn(html)}
+                    helperText="Başlık, alt başlık, açıklama metni ve maddelerinizi Türkçe ve İngilizce sekmelerinden kolayca düzenleyin."
                   />
                 </div>
 

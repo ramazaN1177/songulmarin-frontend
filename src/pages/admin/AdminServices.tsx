@@ -168,33 +168,59 @@ export const AdminServices: React.FC = () => {
           maxWidth="2xl"
         >
           <form onSubmit={handleSave} className="space-y-4 text-xs">
-            <div className="space-y-1">
-              <label className="font-bold text-slate-800 block">Hizmet Adı (TR)*</label>
-              <input
-                type="text"
-                value={editingService.titleTr || ''}
-                onChange={(e) => setEditingService({ ...editingService, titleTr: e.target.value })}
-                required
-                className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-200 focus:outline-none focus:border-blue-600 text-slate-900"
-              />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-1">
+                <label className="font-bold text-slate-800 block">Hizmet Adı (TR)*</label>
+                <input
+                  type="text"
+                  value={editingService.titleTr || ''}
+                  onChange={(e) => setEditingService({ ...editingService, titleTr: e.target.value })}
+                  required
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-200 focus:outline-none focus:border-blue-600 text-slate-900 font-semibold"
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="font-bold text-slate-800 block">Service Title (EN)</label>
+                <input
+                  type="text"
+                  value={editingService.titleEn || ''}
+                  onChange={(e) => setEditingService({ ...editingService, titleEn: e.target.value })}
+                  placeholder="e.g. Marine Crane Maintenance"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-200 focus:outline-none focus:border-blue-600 text-slate-900 font-semibold"
+                />
+              </div>
             </div>
 
-            <div className="space-y-1">
-              <label className="font-bold text-slate-700 block">Özet Açıklama (TR)</label>
-              <textarea
-                rows={2}
-                value={editingService.summaryTr || ''}
-                onChange={(e) => setEditingService({ ...editingService, summaryTr: e.target.value })}
-                className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-200 focus:outline-none focus:border-blue-600 text-slate-900"
-              />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-1">
+                <label className="font-bold text-slate-700 block">Özet Açıklama (TR)</label>
+                <textarea
+                  rows={2}
+                  value={editingService.summaryTr || ''}
+                  onChange={(e) => setEditingService({ ...editingService, summaryTr: e.target.value })}
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-200 focus:outline-none focus:border-blue-600 text-slate-900"
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="font-bold text-slate-700 block">Summary Description (EN)</label>
+                <textarea
+                  rows={2}
+                  value={editingService.summaryEn || ''}
+                  onChange={(e) => setEditingService({ ...editingService, summaryEn: e.target.value })}
+                  placeholder="Short service summary in English"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-200 focus:outline-none focus:border-blue-600 text-slate-900"
+                />
+              </div>
             </div>
 
             <div>
               <RichContentEditor
-                label="Detaylı Hizmet İçeriği"
-                value={editingService.contentTr || ''}
-                onChange={(html) => setEditingService({ ...editingService, contentTr: html })}
-                helperText="Hizmet detayları ve teknik kapsamı kolay form alanlarında doldurun."
+                label="Detaylı Hizmet İçeriği (TR & EN)"
+                valueTr={editingService.contentTr || ''}
+                valueEn={editingService.contentEn || ''}
+                onChangeTr={(html) => setEditingService((prev) => prev ? { ...prev, contentTr: html } : null)}
+                onChangeEn={(html) => setEditingService((prev) => prev ? { ...prev, contentEn: html } : null)}
+                helperText="Hizmet detayları ve teknik kapsamı Türkçe ve İngilizce sekmelerinden doldurun."
               />
             </div>
 
